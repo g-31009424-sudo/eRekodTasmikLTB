@@ -1,0 +1,14 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.clasprc.json
+.clasprc.*.json
+.clasp.json
+*.log
+*.zip
+*.jpg
+*.png
+*.xlsx
+*.csv
+.DS_Store

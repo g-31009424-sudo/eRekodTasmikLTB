@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Semakan Sambungan Rekod Tasmik</title>
+  <style>
+    body{margin:0;background:#f0fdf4;color:#164e3d;font:16px/1.6 system-ui,sans-serif;padding:24px}
+    main{max-width:650px;margin:8vh auto;background:white;padding:32px;border:1px solid #d1fae5;border-radius:20px;box-shadow:0 12px 30px #064e3b12}
+    h1{font-size:26px;line-height:1.25}h2{font-size:17px;margin-top:28px}p{color:#475569}
+    ul{padding-left:22px}li{padding:7px 0}button,a{display:inline-block;padding:11px 18px;background:#047857;color:white;border:0;border-radius:9px;font:inherit;text-decoration:none;cursor:pointer;margin-right:6px}
+    button:disabled{opacity:.6;cursor:wait}#status{padding:15px;background:#f1f5f9;border-radius:10px;overflow-wrap:anywhere}.ok{color:#047857}.error{color:#b91c1c}
+  </style>
+  <script src="./config.js"></script>
+  <script src="./transport.js"></script>
+</head>
+<body><main>
+  <h1>Semakan Sambungan<br>Rekod Tasmik LTB</h1>
+  <p>Semak sambungan laman ini kepada data Tasmik sebelum membuat pengisian.</p>
+  <div id="status" role="status" aria-live="polite">Bersedia untuk menyemak.</div>
+  <ul id="checks"></ul>
+  <button id="run" type="button">Semak Sambungan</button><a href="./">Buka Aplikasi</a>
+  <h2>Jika sambungan gagal</h2>
+  <p>Semak rangkaian dan maklumkan pemilik aplikasi. Jika kegagalan berlaku ketika menyimpan rekod, gunakan Sync untuk menyemak rekod sebelum menghantar semula.</p>
+  <script>
+    document.getElementById('run').addEventListener('click', async function() {
+      this.disabled=true;
+      const status=document.getElementById('status'), checks=document.getElementById('checks');
+      checks.innerHTML='';status.textContent='Sedang menyemak…';status.className='';
+      function add(text){const li=document.createElement('li');li.textContent=text;checks.appendChild(li);}
+      try {
+        const health=await window.tasmikCallHttp('getConnectionStatus',[]);
+        if(!health || !health.success || health.apiVersion!==1)throw Error('Versi sambungan belum tersedia.');
+        add('Sambungan GitHub Pages kepada Apps Script berjaya.');
+        let protectedOk=false;
+        try {await window.tasmikCallHttp('getSyncData',['semakan-tanpa-token']);}
+        catch(e){if(/Sesi tamat atau tidak sah/.test(e.message))protectedOk=true;else throw e;}
+        if(!protectedOk)throw Error('Semakan perlindungan akses guru gagal.');
+        add('Akses rekod penuh memerlukan sesi PIN yang sah.');
+        const dashboard=await window.tasmikCallHttp('getDashboardAwam',[]);
+        if(!dashboard || !dashboard.success)throw Error(dashboard && dashboard.message || 'Data belum dapat dibaca.');
+        add('Data dashboard berjaya dibaca.');
+        status.textContent='Sambungan aktif. Aplikasi sedia dibuka.';status.className='ok';
+      } catch(e){status.textContent=e.message || 'Sambungan gagal.';status.className='error';}
+      finally {this.disabled=false;}
+    });
+  </script>
+</main></body>
+</html>

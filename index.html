@@ -1,84 +1,12 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ms">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
-  <title>Ujian API e-Rekod Tasmik</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0fdf4;
-      padding: 30px;
-      text-align: center;
-    }
-    .card {
-      background: white;
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 5px 20px #0001;
-    }
-    button {
-      background: #047857;
-      color: white;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    #result {
-      margin-top: 20px;
-      overflow-wrap: anywhere;
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0;url=./docs/">
+  <title>Rekod Tasmik LTB</title>
 </head>
 <body>
-  <div class="card">
-    <h2>e-Rekod Tasmik LTB</h2>
-    <p>Ujian Sambungan GitHub Pages</p>
-
-    <button onclick="testConnection()">
-      Uji Sambungan API
-    </button>
-
-    <div id="result">Belum diuji</div>
-  </div>
-
-  <script>
-    // GANTIKAN DENGAN URL WEB APP /exec
-    const API_URL = "https://script.google.com/macros/s/AKfycbwgFhMfRb5IuK644md3aNW-wu73m2eIXuZCxwjKbNLDeiXVNmDyHg75Vo-K_ywpl2la/exec";
-
-    async function testConnection() {
-      const result = document.getElementById("result");
-      result.textContent = "Sedang menguji...";
-
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain"
-          },
-          body: JSON.stringify({
-            action: "ping"
-          }),
-          redirect: "follow"
-        });
-
-        const data = await response.json();
-
-        result.textContent =
-          data.success
-            ? "BERJAYA: " + data.message
-            : "RALAT: " + data.message;
-
-      } catch (error) {
-        result.textContent =
-          "Sambungan gagal: " + error.message;
-      }
-    }
-  </script>
+  <p>Membuka Rekod Tasmik LTB… <a href="./docs/">Buka aplikasi</a></p>
 </body>
 </html>

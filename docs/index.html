@@ -1,0 +1,4911 @@
+<!DOCTYPE html>
+<html lang="ms">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>e-Rekod Tasmik KPM</title>
+
+
+<script src="./config.js"></script>
+<script src="./transport.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background:#f8fafc;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width:6px;
+    height:6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background:#f1f5f9;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background:#cbd5e1;
+    border-radius:10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background:#94a3b8;
+}
+
+.modal-backdrop {
+    background:rgba(15,23,42,.55);
+    backdrop-filter:blur(3px);
+}
+
+
+/* ================================================================
+   RESPONSIVE UI — DESKTOP / TABLET / MOBILE
+   ================================================================ */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+img, canvas { max-width: 100%; }
+button, input, select, textarea { max-width: 100%; }
+button, a, select { touch-action: manipulation; }
+
+/* Jadual kekal boleh dibaca pada skrin kecil */
+.overflow-x-auto, .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+}
+
+table { min-width: max-content; }
+
+/* Modal sentiasa muat dalam viewport */
+.modal-backdrop {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 1rem;
+}
+.modal-backdrop > div {
+    max-width: min(100%, 48rem);
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    margin: auto;
+}
+
+/* Input mesra sentuhan dan elak auto-zoom iOS */
+@media (max-width: 767px) {
+    input, select, textarea {
+        font-size: 16px !important;
+    }
+
+    header > div {
+        padding-left: .75rem !important;
+        padding-right: .75rem !important;
+    }
+
+    header .h-16 {
+        height: auto !important;
+        min-height: 4rem;
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+        gap: .5rem;
+    }
+
+    header .flex.items-center.gap-3 {
+        min-width: 0;
+        gap: .5rem !important;
+    }
+
+    #schoolLogoWrap, #defaultHeaderIcon {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        min-width: 2.5rem;
+        border-radius: .65rem !important;
+    }
+
+    #appStatus {
+        padding: .18rem .38rem !important;
+        font-size: 8px !important;
+        white-space: nowrap;
+    }
+
+    header .font-bold.text-lg {
+        font-size: .95rem !important;
+        line-height: 1.15rem;
+        gap: .3rem !important;
+        white-space: nowrap;
+    }
+
+    header .text-xs.text-emerald-200 {
+        font-size: .65rem !important;
+        line-height: .9rem;
+        max-width: 10.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    header button {
+        min-width: 2.45rem;
+        min-height: 2.45rem;
+        padding: .55rem !important;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    main {
+        padding: 1rem .75rem !important;
+    }
+
+    /* Navigasi tab: swipe mendatar, butang tidak mengecil */
+    main > .border-b.flex {
+        gap: .25rem !important;
+        scroll-snap-type: x proximity;
+        padding-bottom: .2rem;
+    }
+    .tab-button {
+        flex: 0 0 auto;
+        min-height: 2.75rem;
+        padding-left: .75rem !important;
+        padding-right: .75rem !important;
+        white-space: nowrap;
+        scroll-snap-align: start;
+    }
+
+    /* Kad dan panel */
+    .rounded-2xl { border-radius: .9rem !important; }
+    .p-5 { padding: 1rem !important; }
+    .p-6 { padding: 1rem !important; }
+    .gap-6 { gap: 1rem !important; }
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem !important; }
+
+    /* Carta tidak terlalu tinggi pada telefon */
+    .h-72 { height: 15rem !important; }
+    canvas { max-height: 15rem; }
+
+    /* Semua bar tindakan boleh wrap */
+    .flex.gap-2, .flex.gap-3 {
+        row-gap: .5rem;
+    }
+
+    /* Jadual: scroll jelas dan ruang sentuhan lebih baik */
+    table {
+        font-size: .72rem !important;
+    }
+    th, td {
+        white-space: nowrap;
+    }
+    th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    td button {
+        min-width: 2.25rem;
+        min-height: 2.25rem;
+    }
+
+    /* Modal penuh dan selesa di telefon */
+    .modal-backdrop { padding: .5rem !important; }
+    .modal-backdrop > div {
+        width: 100% !important;
+        max-height: calc(100dvh - 1rem);
+        border-radius: 1rem !important;
+    }
+
+    #importPreviewWrap {
+        max-height: 42dvh !important;
+    }
+}
+
+/* Telefon sangat kecil */
+@media (max-width: 390px) {
+    header .text-xs.text-emerald-200 { display: none; }
+    header .font-bold.text-lg { font-size: .88rem !important; }
+    #schoolLogoWrap, #defaultHeaderIcon {
+        width: 2.25rem !important;
+        height: 2.25rem !important;
+        min-width: 2.25rem;
+    }
+    main { padding-left: .6rem !important; padding-right: .6rem !important; }
+    .tab-button { padding-left: .6rem !important; padding-right: .6rem !important; }
+}
+
+/* Tablet: manfaatkan ruang tanpa memampatkan kandungan */
+@media (min-width: 768px) and (max-width: 1023px) {
+    main { padding-left: 1.25rem !important; padding-right: 1.25rem !important; }
+    .modal-backdrop > div { max-width: min(92vw, 48rem); }
+    .h-72 { height: 17rem !important; }
+}
+
+@media print {
+
+    .no-print {
+        display:none !important;
+    }
+
+    body {
+        background:white !important;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body class="text-slate-800 tasmik-public">
+<style>
+#tasmikAuthOverlay { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(6,78,59,.88); padding:18px; font-family:Inter,Arial,sans-serif; }
+#tasmikAuthOverlay:not([hidden]) { display:flex; }
+#tasmikAuthCard { width:100%; max-width:410px; background:white; border-radius:20px; padding:30px 24px; box-shadow:0 20px 60px #0003; text-align:center; }
+#tasmikAuthCard input { width:100%; box-sizing:border-box; padding:13px; border:1px solid #cbd5e1; border-radius:12px; font-size:17px; margin:15px 0; }
+#tasmikAuthCard button { padding:12px; border-radius:12px; font-weight:700; cursor:pointer; }
+#tasmikAuthMessage { min-height:24px; margin-top:12px; color:#b91c1c; font-size:13px; }
+body.tasmik-public #tab-students,body.tasmik-public #tab-records,body.tasmik-public #tab-entry { display:none !important; }
+body.tasmik-public #analysisClassBtn,body.tasmik-public #analysisClassSelect { display:none !important; }
+</style>
+<style>
+#tasmikHelpPanel[hidden] { display:none; }
+#tasmikHelpPanel { position:fixed; inset:0; z-index:100000; overflow:auto; background:rgba(15,23,42,.65); padding:18px; display:flex; align-items:flex-start; justify-content:center; }
+#tasmikHelpCard { width:100%; max-width:540px; margin:auto; background:white; color:#334155; border-radius:18px; padding:24px; font:14px/1.6 Inter,Arial,sans-serif; }
+#tasmikHelpCard h2 { color:#064e3b; font-size:21px; font-weight:800; margin:0 0 12px; }
+#tasmikHelpCard p { margin:10px 0; }
+#tasmikHelpCard ol { list-style:decimal; padding-left:24px; }
+#tasmikHelpCard input { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:16px; box-sizing:border-box; }
+#tasmikHelpCard button, #tasmikHelpCard a { display:inline-block; background:#047857; color:white; border:0; border-radius:8px; padding:10px 12px; margin:8px 4px 0 0; cursor:pointer; font-weight:600; }
+#tasmikHelpMessage { color:#9a3412; overflow-wrap:anywhere; }
+@media(max-width:767px) { header .h-16 { flex-wrap:wrap; } header .h-16 > .flex:last-child { width:100%; justify-content:flex-end; } }
+</style>
+<div id="tasmikHelpPanel" hidden role="dialog" aria-modal="true" aria-labelledby="tasmikHelpTitle">
+ <div id="tasmikHelpCard">
+  <h2 id="tasmikHelpTitle">Bantuan Akses &amp; Kongsi Pautan</h2>
+  <p id="tasmikHelpMessage" role="status" aria-live="polite"></p>
+  <label for="tasmikShareUrl">Pautan untuk dikongsi kepada guru</label>
+  <input id="tasmikShareUrl" readonly onclick="this.select()" />
+  <button id="tasmikCopyLink" type="button" onclick="tasmikCopyShareUrl()">Salin Pautan</button>
+  <a id="tasmikOpenExternal" target="_blank" rel="noopener noreferrer">Buka Tab Baharu</a>
+  <ol>
+   <li>Jika pautan dibuka dari WhatsApp, gunakan menu pelayar untuk buka dalam Safari atau Chrome.</li>
+   <li>Jika halaman Google gagal dibuka, cuba tetingkap Private/Incognito. Jika diminta log masuk, gunakan satu akaun Google sahaja.</li>
+   <li>Kongsi pautan GitHub Pages aplikasi ini. Pautan /exec digunakan sebagai sambungan data sahaja.</li>
+   <li>Jika masih gagal, minta pemilik menyemak deployment dan dasar akaun sekolah.</li>
+  </ol>
+  <p>Butang tab baharu mungkin masih menggunakan pelayar dalam aplikasi. Pilih Safari/Chrome secara manual melalui menunya.</p>
+  <button type="button" onclick="tasmikCloseAccessHelp(); syncDataFromSheets()">Cuba Muat Data</button>
+  <a href="./sambungan.html" target="_blank" rel="noopener noreferrer">Semak Sambungan</a>
+  <button type="button" onclick="tasmikCloseAccessHelp()" style="background:#e2e8f0;color:#334155">Tutup</button>
+ </div>
+</div>
+
+<div id="tasmikAuthOverlay" hidden>
+ <div id="tasmikAuthCard">
+  <div style="font-size:40px;color:#047857">&#128274;</div>
+  <h1 style="font-size:23px;font-weight:800;color:#064e3b;margin:12px 0 4px">Akses Guru e-Rekod Tasmik</h1>
+  <p style="color:#64748b;font-size:14px">PIN diperlukan untuk melihat rekod individu, menambah atau mengubah data.</p>
+  <form id="tasmikAuthForm" onsubmit="return tasmikLogin(event)">
+   <input id="tasmikPinInput" type="password" autocomplete="off" placeholder="Masukkan PIN guru" required minlength="8" />
+   <button id="tasmikAuthButton" type="submit" style="width:100%;background:#047857;color:white;border:0">Masuk Mod Guru</button>
+  </form>
+  <button type="button" onclick="tasmikCloseLogin()" style="margin-top:10px;background:#f1f5f9;color:#334155;border:0;width:100%">Kembali ke Dashboard Awam</button>
+  <div id="tasmikAuthMessage" role="alert"></div>
+ </div>
+</div>
+<script>
+window.tasmikBootstrap = {build:'github-pages-8', shareUrl:new URL('.', window.location.href).href};
+window.tasmikAuthGeneration = 0;
+
+function tasmikStorage(action, value) {
+  try {
+    if (action === 'get') return sessionStorage.getItem('tasmik_session') || '';
+    if (action === 'set') sessionStorage.setItem('tasmik_session', value);
+    else if (action === 'remove') sessionStorage.removeItem('tasmik_session');
+  } catch (e) {
+    // Mod guru masih berfungsi dalam memori jika storan pelayar disekat.
+  }
+  return '';
+}
+function tasmikHasBridge() {
+  return typeof window.tasmikCallHttp === 'function';
+}
+function tasmikShowAccessHelp(message) {
+  const panel = document.getElementById('tasmikHelpPanel');
+  document.getElementById('tasmikHelpMessage').textContent = message || '';
+  const input = document.getElementById('tasmikShareUrl');
+  input.value = window.tasmikBootstrap.shareUrl || '';
+  input.placeholder = 'Dapatkan URL Web app /exec daripada Manage deployments.';
+  const link = document.getElementById('tasmikOpenExternal');
+  link.hidden = !input.value;
+  if (input.value) link.href = input.value;
+  document.getElementById('tasmikCopyLink').disabled = !input.value;
+  panel.hidden = false;
+}
+function tasmikCloseAccessHelp() {
+  document.getElementById('tasmikHelpPanel').hidden = true;
+}
+async function tasmikCopyShareUrl() {
+  const input = document.getElementById('tasmikShareUrl');
+  if (!input.value) return;
+  try {
+    await navigator.clipboard.writeText(input.value);
+    document.getElementById('tasmikHelpMessage').textContent = 'Pautan aplikasi telah disalin. Kongsi pautan ini kepada guru.';
+  } catch (e) {
+    input.focus(); input.select();
+    document.getElementById('tasmikHelpMessage').textContent = 'Tekan dan tahan pautan yang dipilih, kemudian pilih Salin.';
+  }
+}
+
+// Lapisan panggilan ini mengekalkan API sedia ada. Tiada simpan/padam/import
+// diulang automatik kerana pelayan mungkin telah melaksanakan permintaan.
+function tasmikRunner(success, failure) {
+  const runner = {
+    withSuccessHandler: function(fn) { return tasmikRunner(fn, failure); },
+    withFailureHandler: function(fn) { return tasmikRunner(success, fn); }
+  };
+  const publicMethods = ['getDashboardAwam','getLogoAwam','logMasukTasmik','semakSesiTasmik','logKeluarTasmik'];
+  const privateMethods = ['getSyncData','simpanRekod','padamRekodTasmik','simpanMurid','padamMurid','getAnalisisData','importMuridBundle','ciptaTemplateMurid','uploadLogoSekolah','getLogoSekolah','padamLogoSekolah','getTetapanSistem','kemaskanDataMurid'];
+  const reads = ['getDashboardAwam','getLogoAwam','semakSesiTasmik','getSyncData','getAnalisisData','getLogoSekolah','getTetapanSistem','ciptaTemplateMurid'];
+  publicMethods.concat(privateMethods).forEach(function(method) {
+    runner[method] = function() {
+      const args = Array.from(arguments);
+      const generation = window.tasmikAuthGeneration;
+      const guarded = privateMethods.indexOf(method) >= 0;
+      let done = false, timer;
+      function finish(error, result) {
+        if (done) return;
+        done = true; clearTimeout(timer);
+        // Respons lewat selepas log keluar/tukar sesi tidak boleh mengisi UI.
+        if ((guarded && args[0] !== window.tasmikSessionToken) ||
+            ((guarded || method === 'logMasukTasmik' || method === 'semakSesiTasmik') && generation !== window.tasmikAuthGeneration)) return;
+        if (error) {
+          const message = String(error.message || error || 'Sambungan gagal.');
+          const expired = /Sesi tamat atau tidak sah/.test(message);
+          if (expired && guarded) {
+            tasmikResetTeacherSession();
+            tasmikOpenLogin();
+            tasmikSetMessage('Sesi telah tamat. Sila masukkan PIN semula.');
+            tasmikLoadPublicDashboard();
+          } else if (method !== 'logKeluarTasmik') {
+            tasmikShowAccessHelp(message);
+          }
+          if (failure) failure({message:message});
+        } else if (success) success(result);
+      }
+      if (!tasmikHasBridge()) {
+        finish({message:'Sambungan data belum dimuatkan. Muat semula halaman GitHub Pages.'});
+        return;
+      }
+      timer = setTimeout(function() {
+        const message = method === 'logMasukTasmik'
+          ? 'Log masuk belum dapat disahkan. Semak sambungan dan cuba lagi.'
+          : reads.indexOf(method) >= 0
+            ? 'Pelayan belum memberi respons. Semak sambungan dan tekan Cuba Muat Data.'
+            : 'Status tindakan belum dapat disahkan. Semak rekod melalui Sync sebelum menghantar semula; tindakan mungkin telah selesai di pelayan.';
+        finish({message:message});
+      }, reads.indexOf(method) >= 0 ? 45000 : 90000);
+      try {
+        window.tasmikCallHttp(method, args).then(
+          function(r) { finish(null, r); }, function(e) { finish(e); }
+        );
+      } catch (e) { finish(e); }
+    };
+  });
+  return runner;
+}
+
+function tasmikResetTeacherSession() {
+  window.tasmikAuthGeneration++;
+  window.tasmikSessionToken = '';
+  tasmikStorage('remove');
+  document.body.classList.add('tasmik-public');
+  document.getElementById('tasmikTeacherLogin').classList.remove('hidden');
+  document.getElementById('tasmikTeacherLogout').classList.add('hidden');
+  document.getElementById('tasmikPinInput').value = '';
+  document.getElementById('tasmikAuthButton').disabled = false;
+  tasmikCloseLogin(); hideLoading();
+  studentsData = []; recordsData = []; advancedAnalysisData = null;
+  pendingStudentImport = []; pendingLogoData = null;
+  analysisMode = 'overall';
+  renderStudents(); renderRecords(); populateStudentDropdown(); populateClassFilter();
+  document.getElementById('studentBadge').textContent = '0';
+  document.getElementById('recordBadge').textContent = '0';
+  document.getElementById('analysisClassTable').innerHTML = '';
+  document.getElementById('analysisClassSelect').innerHTML = '';
+  document.getElementById('recentTable').innerHTML = '';
+  document.getElementById('tasmikForm').reset();
+  document.getElementById('currentReadingBox').classList.add('hidden');
+  document.querySelectorAll('.modal-backdrop').forEach(function(el) {
+    el.classList.add('hidden'); el.classList.remove('flex');
+  });
+  document.getElementById('syncIcon').classList.remove('fa-spin');
+  switchTab('dashboard');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') tasmikCloseAccessHelp();
+});
+
+window.tasmikSessionToken = '';
+function tasmikSetMessage(message) { document.getElementById('tasmikAuthMessage').textContent = message || ''; }
+function tasmikOpenLogin() { document.getElementById('tasmikAuthOverlay').hidden = false; tasmikSetMessage(''); }
+function tasmikCloseLogin() { document.getElementById('tasmikAuthOverlay').hidden = true; }
+function tasmikUnlock(token) {
+  window.tasmikAuthGeneration++;
+  window.tasmikSessionToken = token;
+  tasmikStorage('set', token);
+  document.body.classList.remove('tasmik-public');
+  document.getElementById('tasmikTeacherLogin').classList.add('hidden');
+  document.getElementById('tasmikTeacherLogout').classList.remove('hidden');
+  tasmikCloseLogin();
+  syncDataFromSheets();
+}
+function tasmikLogin(event) {
+  event.preventDefault();
+  const button = document.getElementById('tasmikAuthButton');
+  button.disabled = true;
+  tasmikSetMessage('Menyemak PIN...');
+  tasmikRunner().withSuccessHandler(function(res) {
+    button.disabled = false;
+    if (res && res.success && res.token) {
+      document.getElementById('tasmikPinInput').value = '';
+      tasmikUnlock(res.token);
+    } else { tasmikSetMessage((res && res.message) || 'PIN tidak sah.'); }
+  }).withFailureHandler(function(err) {
+    button.disabled = false;
+    tasmikSetMessage((err && err.message) || 'Sambungan gagal.');
+  }).logMasukTasmik(document.getElementById('tasmikPinInput').value);
+  return false;
+}
+function tasmikLogout() {
+  const token = window.tasmikSessionToken;
+  tasmikResetTeacherSession();
+  tasmikLoadPublicDashboard();
+  if (token) tasmikRunner().logKeluarTasmik(token);
+}
+
+function tasmikLoadPublicDashboard() {
+  if (window.tasmikSessionToken) return syncDataFromSheets();
+  setSyncStatus('loading','Mengemas kini Dashboard...');
+  tasmikRunner().withSuccessHandler(function(d) {
+    if (window.tasmikSessionToken) return;
+    if (!d || !d.success) { const message = (d && d.message) || 'Gagal memuatkan Dashboard'; setSyncStatus('error',message); tasmikShowAccessHelp(message); return; }
+    document.getElementById('dashStudents').textContent = d.jumlahMurid;
+    document.getElementById('dashRecords').textContent = d.jumlahRekod;
+    document.getElementById('dashQuran').textContent = d.quran;
+    document.getElementById('dashIqra').textContent = d.iqra;
+    document.getElementById('dashQuranPercent').textContent = d.jumlahMurid ? Math.round(d.quran/d.jumlahMurid*100)+'%' : '0%';
+    document.getElementById('dashIqraPercent').textContent = d.jumlahMurid ? Math.round(d.iqra/d.jumlahMurid*100)+'%' : '0%';
+    const aktiviti = Array.isArray(d.aktivitiTerkini) ? d.aktivitiTerkini : [];
+    document.getElementById('recentTable').innerHTML = aktiviti.length
+      ? aktiviti.map(function(r) {
+          return '<tr class="hover:bg-slate-50">' +
+            '<td class="px-3 py-3">' + escapeHtml(r.tarikh || '-') + '</td>' +
+            '<td class="px-3 py-3 font-semibold">' + escapeHtml(r.nama || '-') + '</td>' +
+            '<td class="px-3 py-3">' + escapeHtml(r.tahap || '-') + '</td>' +
+            '<td class="px-3 py-3">' + escapeHtml(r.mukaSurat || '-') + '</td>' +
+            '<td class="px-3 py-3">' + escapeHtml(r.penguasaan || '-') + '</td>' +
+            '</tr>';
+        }).join('')
+      : '<tr><td colspan="5" class="text-center py-8 text-slate-500">Belum ada rekod Tasmik.</td></tr>';
+    const stages = ['Iqra 1','Iqra 2','Iqra 3','Iqra 4','Iqra 5','Iqra 6','Al-Quran','Khatam'];
+    const canvas = document.getElementById('readingChart');
+    if (readingChart) readingChart.destroy();
+    if (typeof Chart !== 'undefined') readingChart = new Chart(canvas.getContext('2d'),{type:'doughnut',data:{labels:stages,datasets:[{data:stages.map(x=>Number(d.tahap[x]||0)),backgroundColor:['#ef4444','#f97316','#f59e0b','#84cc16','#10b981','#06b6d4','#3b82f6','#8b5cf6']}]},options:{responsive:true,maintainAspectRatio:false}});
+    document.getElementById('analysisClassTableWrap').classList.add('hidden');
+    advancedAnalysisData = {success:true,ringkasan:{jumlahMurid:d.jumlahMurid,jumlahMuridBerrekod:d.jumlahBerrekod,jumlahMuridBelumBerrekod:d.jumlahMurid-d.jumlahBerrekod,jumlahRekod:d.jumlahRekod},mengikutTahap:d.tahap,mengikutPenguasaan:d.penguasaan,mengikutKelas:[]};
+    analysisMode='overall';
+    renderAdvancedAnalysis();
+    setSyncStatus('success','Dashboard terkini: '+d.updatedAt);
+  }).withFailureHandler(function() { setSyncStatus('error','Gagal memuatkan Dashboard'); }).getDashboardAwam();
+  tasmikRunner().withSuccessHandler(function(r){if(r && r.success && r.logo) applySchoolLogo(r.logo);}).getLogoAwam();
+}
+document.addEventListener('DOMContentLoaded', function() {
+  document.body.classList.add('tasmik-public');
+  const token = tasmikStorage('get');
+  if (!token) { tasmikLoadPublicDashboard(); return; }
+  const generation = window.tasmikAuthGeneration;
+  tasmikRunner().withSuccessHandler(function(res) {
+    if (generation !== window.tasmikAuthGeneration) return;
+    if (res && res.success) tasmikUnlock(token);
+    else { tasmikStorage('remove'); tasmikLoadPublicDashboard(); }
+  }).withFailureHandler(function() {
+    if (generation !== window.tasmikAuthGeneration) return;
+    tasmikStorage('remove'); tasmikLoadPublicDashboard();
+  }).semakSesiTasmik(token);
+});
+</script>
+
+<!-- ========================================================= -->
+<!-- HEADER -->
+<!-- ========================================================= -->
+
+<header class="bg-emerald-800 text-white shadow-lg sticky top-0 z-40 no-print">
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+<div class="h-16 flex items-center justify-between">
+
+<div class="flex items-center gap-3">
+
+<div id="schoolLogoWrap"
+     class="hidden w-11 h-11 rounded-xl bg-white
+            flex items-center justify-center
+            overflow-hidden border border-emerald-500">
+
+<img id="schoolLogo"
+     src=""
+     alt="Logo Sekolah"
+     class="w-full h-full object-contain">
+
+</div>
+
+<div id="defaultHeaderIcon"
+     class="w-11 h-11 rounded-xl bg-emerald-600
+            flex items-center justify-center
+            text-amber-300 text-xl">
+
+<i class="fa-solid fa-book-quran"></i>
+
+</div>
+
+<div>
+
+<div class="font-bold text-lg flex items-center gap-2">
+
+e-Rekod Tasmik
+
+<span id="appStatus"
+      class="text-[10px] px-2 py-1 rounded-full
+             bg-emerald-700 border border-emerald-500">
+
+GITHUB + GAS
+
+</span>
+
+</div>
+
+<div class="text-xs text-emerald-200">
+
+Sistem Pengurusan & Rekod Bacaan
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="flex items-center gap-2">
+<button type="button" onclick="tasmikShowAccessHelp()" title="Bantuan akses dan pautan perkongsian" class="px-3 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-xs font-semibold">Bantuan / Kongsi</button>
+
+<div class="flex items-center gap-2">
+<button id="tasmikTeacherLogin" onclick="tasmikOpenLogin()" class="px-3 py-2 rounded-lg bg-amber-400 text-emerald-950 text-xs font-bold">🔒 Mod Guru / PIN</button>
+<button id="tasmikTeacherLogout" onclick="tasmikLogout()" class="hidden px-3 py-2 rounded-lg bg-emerald-900 text-white text-xs font-bold">Log Keluar</button>
+<div id="syncStatus"
+     class="hidden md:flex items-center gap-2
+            text-xs bg-emerald-900/60
+            px-3 py-2 rounded-full">
+
+<span id="syncDot"
+      class="w-2 h-2 rounded-full bg-emerald-400">
+</span>
+
+<span id="syncText">
+Data diselaraskan
+</span>
+
+</div>
+
+
+<button onclick="openSystemSettings()"
+        class="px-3 py-2 rounded-lg
+               bg-emerald-700 hover:bg-emerald-600
+               text-xs font-semibold"
+        title="Tetapan Sistem">
+
+<i class="fa-solid fa-gear"></i>
+
+<span class="hidden sm:inline ml-1">
+Tetapan
+</span>
+
+</button>
+
+<button onclick="syncDataFromSheets()"
+        id="syncButton"
+        class="px-3 py-2 rounded-lg
+               bg-emerald-700 hover:bg-emerald-600
+               text-xs font-semibold">
+
+<i id="syncIcon" class="fa-solid fa-rotate"></i>
+
+<span class="hidden sm:inline ml-1">
+Sync
+</span>
+
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+
+<!-- ========================================================= -->
+<!-- MAIN -->
+<!-- ========================================================= -->
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+
+<!-- TAB NAVIGATION -->
+
+<div class="border-b border-slate-200 mb-6
+            flex gap-1 overflow-x-auto custom-scrollbar no-print">
+
+<button id="tab-dashboard"
+        onclick="switchTab('dashboard')"
+        class="tab-button active">
+
+<i class="fa-solid fa-chart-pie"></i>
+
+Dashboard
+
+</button>
+
+
+<button id="tab-students"
+        onclick="switchTab('students')"
+        class="tab-button">
+
+<i class="fa-solid fa-users"></i>
+
+Senarai Murid
+
+<span id="studentBadge"
+      class="ml-1 px-2 py-0.5 rounded-full
+             bg-emerald-100 text-emerald-700 text-[10px]">
+
+0
+
+</span>
+
+</button>
+
+
+<button id="tab-records"
+        onclick="switchTab('records')"
+        class="tab-button">
+
+<i class="fa-solid fa-book-open"></i>
+
+Rekod Bacaan
+
+<span id="recordBadge"
+      class="ml-1 px-2 py-0.5 rounded-full
+             bg-slate-100 text-slate-600 text-[10px]">
+
+0
+
+</span>
+
+</button>
+
+
+<button id="tab-entry"
+        onclick="switchTab('entry')"
+        class="tab-button">
+
+<i class="fa-solid fa-pen-to-square"></i>
+
+Tasmik Baru
+
+</button>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- DASHBOARD -->
+<!-- ========================================================= -->
+
+<section id="view-dashboard"
+         class="view-section space-y-6">
+
+
+<div class="grid grid-cols-1 sm:grid-cols-2
+            lg:grid-cols-4 gap-4">
+
+
+<!-- TOTAL MURID -->
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="flex justify-between items-center">
+
+<div>
+
+<div class="text-xs font-semibold
+            text-slate-500 uppercase">
+
+Jumlah Murid
+
+</div>
+
+<div id="dashStudents"
+     class="text-3xl font-bold mt-1">
+
+0
+
+</div>
+
+</div>
+
+<div class="w-12 h-12 rounded-xl
+            bg-emerald-100 text-emerald-700
+            flex items-center justify-center text-xl">
+
+<i class="fa-solid fa-users"></i>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- REKOD -->
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="flex justify-between items-center">
+
+<div>
+
+<div class="text-xs font-semibold
+            text-slate-500 uppercase">
+
+Jumlah Rekod
+
+</div>
+
+<div id="dashRecords"
+     class="text-3xl font-bold mt-1">
+
+0
+
+</div>
+
+</div>
+
+<div class="w-12 h-12 rounded-xl
+            bg-blue-100 text-blue-700
+            flex items-center justify-center text-xl">
+
+<i class="fa-solid fa-book-open"></i>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- AL-QURAN -->
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="flex justify-between items-center">
+
+<div>
+
+<div class="text-xs font-semibold
+            text-slate-500 uppercase">
+
+Al-Quran
+
+</div>
+
+<div id="dashQuran"
+     class="text-3xl font-bold mt-1 text-emerald-700">
+
+0
+
+</div>
+
+<div id="dashQuranPercent"
+     class="text-[11px] text-slate-400">
+
+0%
+
+</div>
+
+</div>
+
+<div class="w-12 h-12 rounded-xl
+            bg-amber-100 text-amber-700
+            flex items-center justify-center text-xl">
+
+<i class="fa-solid fa-book-quran"></i>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- IQRA -->
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="flex justify-between items-center">
+
+<div>
+
+<div class="text-xs font-semibold
+            text-slate-500 uppercase">
+
+Iqra
+
+</div>
+
+<div id="dashIqra"
+     class="text-3xl font-bold mt-1 text-indigo-700">
+
+0
+
+</div>
+
+<div id="dashIqraPercent"
+     class="text-[11px] text-slate-400">
+
+0%
+
+</div>
+
+</div>
+
+<div class="w-12 h-12 rounded-xl
+            bg-indigo-100 text-indigo-700
+            flex items-center justify-center text-xl">
+
+<i class="fa-solid fa-book"></i>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+<!-- CARTA -->
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="font-bold text-base mb-4">
+
+<i class="fa-solid fa-chart-pie text-emerald-600"></i>
+
+Analisis Bacaan Semasa
+
+</div>
+
+<div class="h-72">
+
+<canvas id="readingChart"></canvas>
+
+</div>
+
+</div>
+
+
+<!-- TERKINI -->
+
+<div class="lg:col-span-2
+            bg-white border border-slate-200
+            rounded-2xl p-5 shadow-sm">
+
+<div class="flex justify-between items-center mb-4">
+
+<div class="font-bold">
+
+<i class="fa-solid fa-clock-rotate-left
+          text-amber-500"></i>
+
+Aktiviti Terkini
+
+</div>
+
+</div>
+
+
+<div class="overflow-auto
+            max-h-80 custom-scrollbar">
+
+<table class="w-full text-xs">
+
+<thead class="bg-slate-50 sticky top-0">
+
+<tr>
+
+<th class="text-left px-3 py-3">
+Tarikh
+</th>
+
+<th class="text-left px-3 py-3">
+Nama
+</th>
+
+<th class="text-left px-3 py-3">
+Tahap
+</th>
+
+<th class="text-left px-3 py-3">
+M/S
+</th>
+
+<th class="text-left px-3 py-3">
+Penguasaan
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recentTable"
+       class="divide-y divide-slate-100">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<section id="advancedAnalysis"
+         class="bg-white border border-slate-200
+                rounded-2xl p-5 shadow-sm mt-6">
+
+<div class="flex flex-col lg:flex-row
+            lg:items-center lg:justify-between gap-3 mb-5">
+
+<div>
+<h3 class="font-bold text-base">
+<i class="fa-solid fa-chart-column text-emerald-600"></i>
+Analisis Rekod Bacaan
+</h3>
+<p class="text-xs text-slate-500 mt-1">
+Analisis dikira terus daripada rekod sebenar dalam Google Sheet.
+</p>
+</div>
+
+<div class="flex flex-wrap gap-2">
+<button id="analysisOverallBtn"
+        onclick="setAnalysisMode('overall')"
+        class="px-3 py-2 rounded-lg text-xs font-semibold
+               bg-emerald-700 text-white">
+Keseluruhan
+</button>
+
+<button id="analysisClassBtn"
+        onclick="setAnalysisMode('class')"
+        class="px-3 py-2 rounded-lg text-xs font-semibold
+               bg-slate-100 text-slate-700">
+Mengikut Kelas
+</button>
+
+<select id="analysisClassSelect"
+        onchange="renderAdvancedAnalysis()"
+        class="hidden px-3 py-2 rounded-lg
+               border border-slate-200 bg-slate-50 text-xs">
+<option value="">Semua Kelas</option>
+</select>
+</div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+<div class="rounded-xl bg-slate-50 p-4">
+<div class="text-[10px] uppercase font-semibold text-slate-500">Jumlah Murid</div>
+<div id="analysisStudents" class="text-2xl font-bold mt-1">0</div>
+</div>
+<div class="rounded-xl bg-slate-50 p-4">
+<div class="text-[10px] uppercase font-semibold text-slate-500">Ada Rekod</div>
+<div id="analysisRecorded" class="text-2xl font-bold mt-1 text-emerald-700">0</div>
+</div>
+<div class="rounded-xl bg-slate-50 p-4">
+<div class="text-[10px] uppercase font-semibold text-slate-500">Belum Rekod</div>
+<div id="analysisUnrecorded" class="text-2xl font-bold mt-1 text-amber-600">0</div>
+</div>
+<div class="rounded-xl bg-slate-50 p-4">
+<div class="text-[10px] uppercase font-semibold text-slate-500">Jumlah Bacaan</div>
+<div id="analysisRecords" class="text-2xl font-bold mt-1 text-blue-700">0</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+<div class="border border-slate-100 rounded-xl p-4">
+<div class="font-semibold text-sm mb-3">Tahap Bacaan</div>
+<div class="h-64"><canvas id="analysisStageChart"></canvas></div>
+</div>
+
+<div class="border border-slate-100 rounded-xl p-4">
+<div class="font-semibold text-sm mb-3">Penguasaan</div>
+<div class="h-64"><canvas id="analysisMasteryChart"></canvas></div>
+</div>
+</div>
+
+<div id="analysisClassTableWrap" class="hidden mt-5 overflow-x-auto">
+<table class="w-full text-sm">
+<thead class="bg-slate-50">
+<tr>
+<th class="text-left px-3 py-3">Kelas</th>
+<th class="text-center px-3 py-3">Jumlah Murid</th>
+<th class="text-center px-3 py-3">Ada Rekod</th>
+<th class="text-center px-3 py-3">Belum Rekod</th>
+<th class="text-center px-3 py-3">Jumlah Bacaan</th>
+</tr>
+</thead>
+<tbody id="analysisClassTable" class="divide-y divide-slate-100"></tbody>
+</table>
+</div>
+
+</section>
+</section>
+
+
+
+<!-- ========================================================= -->
+<!-- SENARAI MURID -->
+<!-- ========================================================= -->
+
+<section id="view-students"
+         class="view-section hidden space-y-4">
+
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-4 shadow-sm">
+
+<div class="flex flex-col md:flex-row
+            gap-3 justify-between">
+
+
+<div class="flex flex-col sm:flex-row gap-2 flex-1">
+
+<input id="studentSearch"
+       oninput="renderStudents()"
+       type="text"
+       placeholder="Cari nama murid..."
+       class="px-3 py-2.5 rounded-xl
+              border border-slate-200
+              bg-slate-50 text-sm
+              focus:ring-2 focus:ring-emerald-500
+              outline-none w-full sm:max-w-sm">
+
+
+<select id="classFilter"
+        onchange="renderStudents()"
+        class="px-3 py-2.5 rounded-xl
+               border border-slate-200
+               bg-slate-50 text-sm">
+
+<option value="">
+Semua Kelas
+</option>
+
+</select>
+
+</div>
+
+
+<div class="flex flex-wrap gap-2">
+<button onclick="openImportStudentModal()"
+        class="bg-blue-700
+               hover:bg-blue-800
+               text-white px-4 py-2.5
+               rounded-xl text-sm font-semibold
+               whitespace-nowrap">
+<i class="fa-solid fa-file-import"></i>
+Import Bundle
+</button>
+
+<button onclick="openAddStudentModal()"
+        class="bg-emerald-700
+               hover:bg-emerald-800
+               text-white px-4 py-2.5
+               rounded-xl text-sm font-semibold
+               whitespace-nowrap">
+
+<i class="fa-solid fa-user-plus"></i>
+
+Tambah Murid
+
+</button>
+
+</div>
+
+</div>
+
+
+<div class="bg-white border border-slate-200
+            rounded-2xl shadow-sm overflow-hidden">
+
+<div class="overflow-x-auto custom-scrollbar">
+
+<table class="w-full text-sm">
+
+<thead class="bg-slate-50
+              border-b border-slate-200">
+
+<tr>
+
+<th class="text-left px-4 py-3">
+Bil.
+</th>
+
+<th class="text-left px-4 py-3">
+Nama Murid
+</th>
+
+<th class="text-left px-4 py-3">
+Kelas
+</th>
+
+<th class="text-left px-4 py-3">
+Bacaan Semasa
+</th>
+
+<th class="text-left px-4 py-3">
+M/S
+</th>
+
+<th class="text-center px-4 py-3">
+Tindakan
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="studentTable"
+       class="divide-y divide-slate-100">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- REKOD BACAAN -->
+<!-- ========================================================= -->
+
+<section id="view-records"
+         class="view-section hidden space-y-4">
+
+
+<div class="bg-white border border-slate-200
+            rounded-2xl p-4 shadow-sm">
+
+<div class="flex flex-col md:flex-row
+            justify-between gap-3">
+
+<input id="recordSearch"
+       oninput="renderRecords()"
+       type="text"
+       placeholder="Cari nama, tahap, surah atau tarikh..."
+       class="px-3 py-2.5 rounded-xl
+              border border-slate-200
+              bg-slate-50 text-sm
+              focus:ring-2 focus:ring-emerald-500
+              outline-none w-full md:max-w-md">
+
+
+<div class="text-xs text-slate-500 flex items-center">
+
+<i class="fa-solid fa-circle-info mr-2"></i>
+
+Padam di sini = padam terus daripada Google Sheet
+
+</div>
+
+</div>
+
+</div>
+
+
+<div class="bg-white border border-slate-200
+            rounded-2xl shadow-sm overflow-hidden">
+
+<div class="overflow-x-auto custom-scrollbar">
+
+<table class="w-full text-sm">
+
+<thead class="bg-slate-50
+              border-b border-slate-200">
+
+<tr>
+
+<th class="text-left px-4 py-3">
+Tarikh
+</th>
+
+<th class="text-left px-4 py-3">
+Nama Murid
+</th>
+
+<th class="text-left px-4 py-3">
+Tahap
+</th>
+
+<th class="text-left px-4 py-3">
+Surah/Jilid
+</th>
+
+<th class="text-left px-4 py-3">
+M/S
+</th>
+
+<th class="text-left px-4 py-3">
+Penguasaan
+</th>
+
+<th class="text-center px-4 py-3">
+Tindakan
+</th>
+
+</tr>
+
+</thead>
+
+<tbody id="recordTable"
+       class="divide-y divide-slate-100">
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ========================================================= -->
+<!-- TASMIK BARU -->
+<!-- ========================================================= -->
+
+<section id="view-entry"
+         class="view-section hidden max-w-3xl mx-auto">
+
+
+<div class="bg-white border border-slate-200
+            rounded-2xl shadow-sm p-6">
+
+
+<div class="border-b border-slate-100
+            pb-4 mb-6">
+
+<h2 class="font-bold text-xl">
+
+<i class="fa-solid fa-pen-to-square
+          text-emerald-600"></i>
+
+Tasmik Baru
+
+</h2>
+
+<p class="text-xs text-slate-500 mt-1">
+
+Pilih murid untuk melihat bacaan terakhir.
+
+</p>
+
+</div>
+
+
+<form id="tasmikForm"
+      onsubmit="submitTasmik(event)"
+      class="space-y-5">
+
+
+<!-- MURID -->
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+
+Nama Murid
+
+<span class="text-red-500">*</span>
+
+</label>
+
+<select id="entryStudent"
+        onchange="studentSelected()"
+        required
+        class="w-full px-4 py-3
+               rounded-xl border
+               border-slate-300
+               bg-slate-50
+               focus:ring-2
+               focus:ring-emerald-500
+               outline-none">
+
+<option value="">
+-- Pilih Murid --
+
+</option>
+
+</select>
+
+</div>
+
+
+<!-- MAKLUMAT SEMASA -->
+
+<div id="currentReadingBox"
+     class="hidden p-4
+            bg-emerald-50
+            border border-emerald-200
+            rounded-xl">
+
+<div class="text-xs font-semibold
+            text-emerald-800 mb-2">
+
+BACAAN SEMASA
+
+</div>
+
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+<div>
+
+<div class="text-[10px] text-emerald-600">
+Kelas
+</div>
+
+<div id="entryClass"
+     class="font-bold text-sm">
+-
+</div>
+
+</div>
+
+
+<div>
+
+<div class="text-[10px] text-emerald-600">
+Tahap
+</div>
+
+<div id="entryCurrentStage"
+     class="font-bold text-sm">
+-
+</div>
+
+</div>
+
+
+<div>
+
+<div class="text-[10px] text-emerald-600">
+Muka Surat
+</div>
+
+<div id="entryCurrentPage"
+     class="font-bold text-sm">
+-
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- TAHAP + SURAH -->
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Tahap Bacaan
+</label>
+
+<select id="entryStage"
+        required
+        class="w-full px-4 py-3
+               rounded-xl border
+               border-slate-300
+               bg-slate-50">
+
+<option value="Iqra 1">Iqra 1</option>
+<option value="Iqra 2">Iqra 2</option>
+<option value="Iqra 3">Iqra 3</option>
+<option value="Iqra 4">Iqra 4</option>
+<option value="Iqra 5">Iqra 5</option>
+<option value="Iqra 6">Iqra 6</option>
+<option value="Al-Quran">Al-Quran</option>
+<option value="Khatam">Khatam Al-Quran</option>
+
+</select>
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Nama Surah
+</label>
+
+<input id="entrySurah"
+       list="surahList"
+       placeholder="Contoh: Al-Fatihah"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              bg-slate-50">
+
+<datalist id="surahList"></datalist>
+
+</div>
+
+</div>
+
+
+<!-- M/S + PENGUASAAN -->
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Muka Surat
+</label>
+
+<input id="entryPage"
+       type="number"
+       min="1"
+       max="604"
+       required
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              bg-slate-50">
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Penguasaan
+</label>
+
+<select id="entryMastery"
+        required
+        class="w-full px-4 py-3
+               rounded-xl border
+               border-slate-300
+               bg-slate-50">
+
+<option>
+Cemerlang (Lancar & Tajwid)
+</option>
+
+<option>
+Baik (Lancar)
+</option>
+
+<option>
+Memuaskan (Perlu Bimbingan)
+</option>
+
+<option>
+Perlu Mengulang
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<!-- TARIKH + GURU -->
+
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Tarikh Tasmik
+</label>
+
+<input id="entryDate"
+       type="date"
+       required
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              bg-slate-50">
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Guru
+</label>
+
+<input id="entryTeacher"
+       value="Guru Tasmik"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              bg-slate-50">
+
+</div>
+
+</div>
+
+
+<!-- AYAT -->
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Ayat
+</label>
+
+<input id="entryAyat"
+       placeholder="Contoh: Ayat 1 - 15"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              bg-slate-50">
+
+</div>
+
+
+<!-- CATATAN -->
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Catatan
+</label>
+
+<textarea id="entryNotes"
+          rows="3"
+          placeholder="Catatan guru..."
+          class="w-full px-4 py-3
+                 rounded-xl border
+                 border-slate-300
+                 bg-slate-50"></textarea>
+
+</div>
+
+
+<!-- BUTTON -->
+
+<div class="pt-3 border-t
+            border-slate-100
+            flex justify-end">
+
+<button id="saveTasmikButton"
+        type="submit"
+        class="bg-emerald-700
+               hover:bg-emerald-800
+               text-white px-6 py-3
+               rounded-xl
+               font-semibold
+               text-sm">
+
+<i class="fa-solid fa-floppy-disk"></i>
+
+Simpan Rekod Tasmik
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</section>
+
+
+</main>
+
+
+<!-- ========================================================= -->
+<!-- MODAL TAMBAH MURID -->
+<!-- ========================================================= -->
+
+<div id="studentModal"
+     class="hidden fixed inset-0 z-50
+            modal-backdrop
+            items-center justify-center
+            p-4">
+
+
+<div class="bg-white rounded-2xl
+            shadow-2xl w-full max-w-md">
+
+
+<div class="px-6 py-5
+            border-b border-slate-100
+            flex justify-between items-center">
+
+<div>
+
+<h3 class="font-bold text-lg">
+
+<i class="fa-solid fa-user-plus
+          text-emerald-600"></i>
+
+Tambah Murid
+
+</h3>
+
+<p class="text-xs text-slate-500">
+Masukkan maklumat asas murid sahaja.
+</p>
+
+</div>
+
+
+<button onclick="closeAddStudentModal()"
+        class="w-9 h-9 rounded-lg
+               bg-slate-100
+               hover:bg-slate-200">
+
+<i class="fa-solid fa-xmark"></i>
+
+</button>
+
+</div>
+
+
+<form onsubmit="submitNewStudent(event)"
+      class="p-6 space-y-4">
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+ID Murid
+</label>
+
+<input id="newStudentID"
+       placeholder="Pilihan"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300">
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Nama Murid
+<span class="text-red-500">*</span>
+</label>
+
+<input id="newStudentName"
+       required
+       placeholder="NAMA PENUH MURID"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300
+              uppercase">
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Kelas
+</label>
+
+<input id="newStudentClass"
+       placeholder="Contoh: 4 Bestari"
+       class="w-full px-4 py-3
+              rounded-xl border
+              border-slate-300">
+
+</div>
+
+
+<div>
+
+<label class="block text-sm font-semibold mb-1">
+Jantina
+</label>
+
+<select id="newStudentGender"
+        class="w-full px-4 py-3
+               rounded-xl border
+               border-slate-300">
+
+<option value="">
+-- Pilih --
+
+</option>
+
+<option value="Lelaki">
+Lelaki
+</option>
+
+<option value="Perempuan">
+Perempuan
+</option>
+
+</select>
+
+</div>
+
+
+<div class="pt-3 flex justify-end gap-2">
+
+<button type="button"
+        onclick="closeAddStudentModal()"
+        class="px-4 py-2.5
+               rounded-xl
+               bg-slate-100
+               text-slate-700
+               text-sm font-semibold">
+
+Batal
+
+</button>
+
+
+<button type="submit"
+        id="saveStudentButton"
+        class="px-5 py-2.5
+               rounded-xl
+               bg-emerald-700
+               text-white
+               text-sm font-semibold">
+
+<i class="fa-solid fa-user-plus"></i>
+
+Tambah
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL IMPORT BUNDLE MURID -->
+<!-- ========================================================= -->
+
+<div id="importStudentModal"
+     class="hidden fixed inset-0 z-50 modal-backdrop
+            items-center justify-center p-4">
+
+<div class="bg-white rounded-2xl shadow-2xl
+            w-full max-w-4xl max-h-[90vh] overflow-hidden">
+
+<div class="px-6 py-5 border-b border-slate-100
+            flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg">
+<i class="fa-solid fa-file-import text-blue-600"></i>
+Import Murid Secara Bundle
+</h3>
+<p class="text-xs text-slate-500 mt-1">
+Muat turun template, isi nama murid dan upload semula.
+</p>
+</div>
+<button onclick="closeImportStudentModal()"
+        class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+
+<div class="p-6 space-y-4 overflow-y-auto max-h-[75vh]">
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+<div class="border border-slate-200 rounded-xl p-4">
+<div class="font-semibold text-sm">1. Template</div>
+<p class="text-xs text-slate-500 mt-1 mb-3">
+Kolum: ID, Nama Murid, Kelas, Jantina.
+</p>
+<button onclick="downloadStudentTemplate()"
+        class="px-4 py-2.5 rounded-lg bg-emerald-700
+               text-white text-sm font-semibold">
+<i class="fa-solid fa-file-excel"></i>
+Muat Turun Templat CSV
+</button>
+</div>
+
+<div class="border border-slate-200 rounded-xl p-4">
+<div class="font-semibold text-sm">2. Upload</div>
+<p class="text-xs text-slate-500 mt-1 mb-3">
+Sokong Excel (.xlsx/.xls) dan CSV.
+</p>
+<input id="studentImportFile"
+       type="file"
+       accept=".xlsx,.xls,.csv"
+       onchange="handleStudentImportFile(event)"
+       class="w-full text-sm">
+</div>
+</div>
+
+<div id="importSummary"
+     class="hidden rounded-xl bg-blue-50 border border-blue-200
+            p-4 text-sm"></div>
+
+<div id="importPreviewWrap"
+     class="hidden border border-slate-200 rounded-xl overflow-hidden">
+<div class="px-4 py-3 bg-slate-50 border-b font-semibold text-sm">
+Pratonton Data Import
+</div>
+<div class="overflow-auto max-h-80">
+<table class="w-full text-xs">
+<thead class="bg-slate-50 sticky top-0">
+<tr>
+<th class="px-3 py-2 text-left">ID</th>
+<th class="px-3 py-2 text-left">Nama Murid</th>
+<th class="px-3 py-2 text-left">Kelas</th>
+<th class="px-3 py-2 text-left">Jantina</th>
+<th class="px-3 py-2 text-left">Status</th>
+</tr>
+</thead>
+<tbody id="importPreviewTable"></tbody>
+</table>
+</div>
+</div>
+
+<div class="flex justify-end gap-2 pt-2">
+<button onclick="closeImportStudentModal()"
+        class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">
+Batal
+</button>
+<button id="confirmImportButton"
+        onclick="confirmStudentImport()"
+        disabled
+        class="px-5 py-2.5 rounded-xl bg-blue-700 text-white text-sm font-semibold disabled:opacity-40">
+<i class="fa-solid fa-cloud-arrow-up"></i>
+Import ke Data Murid
+</button>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- MODAL TETAPAN SISTEM -->
+<!-- ========================================================= -->
+
+<div id="systemSettingsModal"
+     class="hidden fixed inset-0 z-50 modal-backdrop
+            items-center justify-center p-4">
+
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+
+<div class="px-6 py-5 border-b border-slate-100
+            flex justify-between items-center">
+<div>
+<h3 class="font-bold text-lg">
+<i class="fa-solid fa-gear text-emerald-600"></i>
+Tetapan Sistem
+</h3>
+<p class="text-xs text-slate-500 mt-1">
+Tetapan tambahan untuk aplikasi e-Rekod Tasmik.
+</p>
+</div>
+<button onclick="closeSystemSettings()"
+        class="w-9 h-9 rounded-lg bg-slate-100 hover:bg-slate-200">
+<i class="fa-solid fa-xmark"></i>
+</button>
+</div>
+
+<div class="p-6 space-y-5">
+
+<div>
+<div class="font-semibold text-sm mb-2">Logo Sekolah</div>
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 rounded-xl border border-slate-200
+            bg-slate-50 flex items-center justify-center overflow-hidden">
+<img id="settingsLogoPreview" src="" alt="Logo"
+     class="hidden w-full h-full object-contain">
+<i id="settingsLogoPlaceholder"
+   class="fa-solid fa-school text-2xl text-slate-300"></i>
+</div>
+<div class="flex-1">
+<input id="schoolLogoFile"
+       type="file"
+       accept="image/png,image/jpeg,image/webp"
+       onchange="previewSchoolLogo(event)"
+       class="w-full text-sm">
+<p class="text-[11px] text-slate-400 mt-1">
+PNG, JPG atau WEBP. Maksimum 2 MB.
+</p>
+</div>
+</div>
+</div>
+
+<div class="flex justify-end gap-2">
+<button onclick="closeSystemSettings()"
+        class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-semibold">
+Tutup
+</button>
+<button onclick="uploadSchoolLogo()"
+        id="uploadLogoButton"
+        class="px-5 py-2.5 rounded-xl bg-emerald-700 text-white text-sm font-semibold">
+<i class="fa-solid fa-upload"></i>
+Simpan Logo
+</button>
+<button onclick="removeSchoolLogo()"
+        class="px-4 py-2.5 rounded-xl bg-red-100 text-red-700 text-sm font-semibold">
+<i class="fa-solid fa-trash"></i>
+Padam Logo
+</button>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- ========================================================= -->
+<!-- LOADING -->
+<!-- ========================================================= -->
+
+<div id="loadingOverlay"
+     class="hidden fixed inset-0 z-[60]
+            bg-slate-900/40
+            items-center justify-center">
+
+<div class="bg-white rounded-2xl
+            px-7 py-6 shadow-2xl
+            text-center">
+
+<div class="text-emerald-700
+            text-3xl mb-3">
+
+<i class="fa-solid fa-spinner fa-spin"></i>
+
+</div>
+
+<div id="loadingText"
+     class="font-semibold text-sm">
+
+Memproses...
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ========================================================= -->
+<!-- JAVASCRIPT -->
+<!-- ========================================================= -->
+
+<script>
+
+
+// ================================================================
+// DATA GLOBAL
+// ================================================================
+
+let studentsData = [];
+
+let recordsData = [];
+
+let readingChart = null;
+
+
+// ================================================================
+// SENARAI SURAH
+// ================================================================
+
+const QURAN_SURAHS = [
+"Al-Fatihah",
+"Al-Baqarah",
+"Ali 'Imran",
+"An-Nisa'",
+"Al-Ma'idah",
+"Al-An'am",
+"Al-A'raf",
+"Al-Anfal",
+"At-Tawbah",
+"Yunus",
+"Hud",
+"Yusuf",
+"Ar-Ra'd",
+"Ibrahim",
+"Al-Hijr",
+"An-Nahl",
+"Al-Isra'",
+"Al-Kahf",
+"Maryam",
+"Ta-Ha",
+"Al-Anbiya'",
+"Al-Hajj",
+"Al-Mu'minun",
+"An-Nur",
+"Al-Furqan",
+"Ash-Shu'ara",
+"An-Naml",
+"Al-Qasas",
+"Al-'Ankabut",
+"Ar-Rum",
+"Luqman",
+"As-Sajdah",
+"Al-Ahzab",
+"Saba'",
+"Fatir",
+"Ya-Sin",
+"As-Saffat",
+"Sad",
+"Az-Zumar",
+"Ghafir",
+"Fussilat",
+"Ash-Shura",
+"Az-Zukhruf",
+"Ad-Dukhan",
+"Al-Jathiyah",
+"Al-Ahqaf",
+"Muhammad",
+"Al-Fath",
+"Al-Hujurat",
+"Qaf",
+"Adh-Dhariyat",
+"At-Tur",
+"An-Najm",
+"Al-Qamar",
+"Ar-Rahman",
+"Al-Waqi'ah",
+"Al-Hadid",
+"Al-Mujadila",
+"Al-Hashr",
+"Al-Mumtahanah",
+"As-Saff",
+"Al-Jumu'ah",
+"Al-Munafiqun",
+"At-Taghabun",
+"At-Talaq",
+"At-Tahrim",
+"Al-Mulk",
+"Al-Qalam",
+"Al-Haqqah",
+"Al-Ma'arij",
+"Nuh",
+"Al-Jinn",
+"Al-Muzzammil",
+"Al-Muddaththir",
+"Al-Qiyamah",
+"Al-Insan",
+"Al-Mursalat",
+"An-Naba'",
+"An-Nazi'at",
+"'Abasa",
+"At-Takwir",
+"Al-Infitar",
+"Al-Mutaffifin",
+"Al-Inshiqaq",
+"Al-Buruj",
+"At-Tariq",
+"Al-A'la",
+"Al-Ghashiyah",
+"Al-Fajr",
+"Al-Balad",
+"Ash-Shams",
+"Al-Layl",
+"Ad-Duha",
+"Ash-Sharh",
+"At-Tin",
+"Al-'Alaq",
+"Al-Qadr",
+"Al-Bayyinah",
+"Az-Zalzalah",
+"Al-'Adiyat",
+"Al-Qari'ah",
+"At-Takathur",
+"Al-'Asr",
+"Al-Humazah",
+"Al-Fil",
+"Quraysh",
+"Al-Ma'un",
+"Al-Kawthar",
+"Al-Kafirun",
+"An-Nasr",
+"Al-Masad",
+"Al-Ikhlas",
+"Al-Falaq",
+"An-Nas"
+];
+
+
+// ================================================================
+// INIT
+// ================================================================
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    populateSurahList();
+
+    setTodayDate();
+
+    // Data dimuat selepas PIN disahkan.
+
+});
+
+
+// ================================================================
+// SURAH
+// ================================================================
+
+function populateSurahList() {
+
+    const list = document.getElementById("surahList");
+
+    list.innerHTML = "";
+
+    QURAN_SURAHS.forEach(function(surah) {
+
+        const option = document.createElement("option");
+
+        option.value = surah;
+
+        list.appendChild(option);
+
+    });
+
+}
+
+
+// ================================================================
+// TARIKH HARI INI
+// ================================================================
+
+function setTodayDate() {
+
+    const today = new Date();
+
+    const yyyy = today.getFullYear();
+
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+
+    const dd = String(today.getDate()).padStart(2, "0");
+
+    document.getElementById("entryDate").value =
+        `${yyyy}-${mm}-${dd}`;
+
+}
+
+
+// ================================================================
+// SYNC GOOGLE SHEETS
+// ================================================================
+
+function syncDataFromSheets() {
+    if (!window.tasmikSessionToken) return tasmikLoadPublicDashboard();
+
+    if (!tasmikHasBridge()) {
+
+        setSyncStatus(
+            "error",
+            "Sambungan data belum tersedia"
+        );
+
+        return;
+
+    }
+
+
+    setSyncStatus(
+        "loading",
+        "Menyelaraskan data..."
+    );
+
+
+    document.getElementById("syncIcon")
+        .classList.add("fa-spin");
+
+
+    tasmikRunner()
+
+        .withSuccessHandler(function(response) {
+
+            document.getElementById("syncIcon")
+                .classList.remove("fa-spin");
+
+
+            if (!response || !response.success) {
+
+                setSyncStatus(
+                    "error",
+                    response?.error || "Gagal membaca data"
+                );
+
+                return;
+
+            }
+
+
+            studentsData = Array.isArray(response.murid)
+                ? response.murid
+                : [];
+
+
+            recordsData = Array.isArray(response.rekod)
+                ? response.rekod
+                : [];
+
+
+            /*
+             * Pastikan bacaan semasa dikira semula
+             * di browser juga.
+             */
+
+            recalculateCurrentReading();
+
+
+            renderAll();
+
+
+            setSyncStatus(
+                "success",
+                "Data diselaraskan"
+            );
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            document.getElementById("syncIcon")
+                .classList.remove("fa-spin");
+
+
+            setSyncStatus(
+                "error",
+                "Gagal: " + (error?.message || "Ralat")
+            );
+
+
+            alert(
+                "Gagal mendapatkan data daripada Google Sheets.\n\n" +
+                (error?.message || "Ralat tidak diketahui.")
+            );
+
+        })
+
+        .getSyncData(window.tasmikSessionToken);
+
+}
+
+
+// ================================================================
+// KIRA SEMULA BACAAN SEMASA
+// ================================================================
+
+function recalculateCurrentReading() {
+
+    studentsData.forEach(function(student) {
+
+        const studentName =
+            normalizeName(student.nama);
+
+
+        const matching = recordsData
+            .filter(function(record) {
+
+                return normalizeName(record.nama)
+                    === studentName;
+
+            });
+
+
+        if (matching.length === 0) {
+
+            student.tahapSemasa =
+                "Belum ada rekod";
+
+            student.msSemasa = "-";
+
+            student.currentRecordId = "";
+
+            student.currentDate = "";
+
+            return;
+
+        }
+
+
+        matching.sort(function(a, b) {
+
+            const dateA = parseDateValue(a.tarikh);
+
+            const dateB = parseDateValue(b.tarikh);
+
+
+            if (dateB.getTime() !== dateA.getTime()) {
+
+                return dateB - dateA;
+
+            }
+
+
+            return Number(b.recordId || 0)
+                - Number(a.recordId || 0);
+
+        });
+
+
+        const latest = matching[0];
+
+
+        student.tahapSemasa =
+            latest.tahap || "Tidak dinyatakan";
+
+
+        student.msSemasa =
+            latest.mukaSurat || "-";
+
+
+        student.currentRecordId =
+            latest.recordId || "";
+
+
+        student.currentDate =
+            latest.tarikh || "";
+
+    });
+
+}
+
+
+// ================================================================
+// RENDER SEMUA
+// ================================================================
+
+function renderAll() {
+
+    document.getElementById("studentBadge")
+        .textContent = studentsData.length;
+
+
+    document.getElementById("recordBadge")
+        .textContent = recordsData.length;
+
+
+    populateStudentDropdown();
+
+    populateClassFilter();
+
+    renderDashboard();
+
+    renderStudents();
+
+    renderRecords();
+
+}
+
+
+// ================================================================
+// DASHBOARD
+// ================================================================
+
+function renderDashboard() {
+
+    const totalStudents =
+        studentsData.length;
+
+
+    const totalRecords =
+        recordsData.length;
+
+
+    document.getElementById("dashStudents")
+        .textContent = totalStudents;
+
+
+    document.getElementById("dashRecords")
+        .textContent = totalRecords;
+
+
+    let quranCount = 0;
+
+    let iqraCount = 0;
+
+
+    studentsData.forEach(function(student) {
+
+        const stage =
+            normalizeStage(student.tahapSemasa);
+
+
+        if (
+            stage === "Al-Quran" ||
+            stage === "Khatam"
+        ) {
+
+            quranCount++;
+
+        } else if (
+            stage.indexOf("Iqra") === 0
+        ) {
+
+            iqraCount++;
+
+        }
+
+    });
+
+
+    document.getElementById("dashQuran")
+        .textContent = quranCount;
+
+
+    document.getElementById("dashIqra")
+        .textContent = iqraCount;
+
+
+    document.getElementById("dashQuranPercent")
+        .textContent = totalStudents
+            ? Math.round(
+                quranCount / totalStudents * 100
+              ) + "%"
+            : "0%";
+
+
+    document.getElementById("dashIqraPercent")
+        .textContent = totalStudents
+            ? Math.round(
+                iqraCount / totalStudents * 100
+              ) + "%"
+            : "0%";
+
+
+    renderReadingChart();
+
+    renderRecentRecords();
+
+}
+
+
+// ================================================================
+// CARTA
+// ================================================================
+
+function renderReadingChart() {
+    if (typeof Chart === "undefined") return;
+
+    const stages = [
+        "Iqra 1",
+        "Iqra 2",
+        "Iqra 3",
+        "Iqra 4",
+        "Iqra 5",
+        "Iqra 6",
+        "Al-Quran",
+        "Khatam"
+    ];
+
+
+    const counts =
+        stages.map(function(stage) {
+
+            return studentsData.filter(function(student) {
+
+                return normalizeStage(
+                    student.tahapSemasa
+                ) === stage;
+
+            }).length;
+
+        });
+
+
+    const canvas =
+        document.getElementById("readingChart");
+
+
+    if (!canvas) return;
+
+
+    if (readingChart) {
+
+        readingChart.destroy();
+
+    }
+
+
+    readingChart = new Chart(
+        canvas.getContext("2d"),
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: stages,
+
+                datasets: [{
+
+                    data: counts,
+
+                    backgroundColor: [
+                        "#ef4444",
+                        "#f97316",
+                        "#f59e0b",
+                        "#84cc16",
+                        "#10b981",
+                        "#06b6d4",
+                        "#3b82f6",
+                        "#8b5cf6"
+                    ],
+
+                    borderWidth: 2,
+
+                    borderColor: "#ffffff"
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+
+                        position: "right",
+
+                        labels: {
+
+                            boxWidth: 12,
+
+                            font: {
+                                size: 10
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+// ================================================================
+// AKTIVITI TERKINI
+// ================================================================
+
+function renderRecentRecords() {
+
+    const tbody =
+        document.getElementById("recentTable");
+
+
+    const recent =
+        [...recordsData]
+        .sort(function(a, b) {
+
+            const d1 = parseDateValue(a.tarikh);
+            const d2 = parseDateValue(b.tarikh);
+
+            if (d2.getTime() !== d1.getTime()) {
+                return d2 - d1;
+            }
+
+            return Number(b.recordId || 0)
+                - Number(a.recordId || 0);
+
+        })
+        .slice(0, 10);
+
+
+    if (!recent.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5"
+                    class="text-center py-8 text-slate-400">
+                    Belum ada rekod Tasmik.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        recent.map(function(record) {
+
+            return `
+            <tr class="hover:bg-slate-50">
+
+                <td class="px-3 py-3">
+                    ${escapeHtml(record.tarikh || "-")}
+                </td>
+
+                <td class="px-3 py-3 font-semibold">
+                    ${escapeHtml(record.nama)}
+                </td>
+
+                <td class="px-3 py-3">
+                    ${escapeHtml(record.tahap || "-")}
+                </td>
+
+                <td class="px-3 py-3">
+                    ${escapeHtml(record.mukaSurat || "-")}
+                </td>
+
+                <td class="px-3 py-3">
+                    ${escapeHtml(record.penguasaan || "-")}
+                </td>
+
+            </tr>
+            `;
+
+        }).join("");
+
+}
+
+
+// ================================================================
+// SENARAI MURID
+// ================================================================
+
+function renderStudents() {
+
+    const search =
+        (document.getElementById("studentSearch")
+            ?.value || "")
+        .toLowerCase()
+        .trim();
+
+
+    const selectedClass =
+        document.getElementById("classFilter")
+            ?.value || "";
+
+
+    const filtered =
+        studentsData.filter(function(student) {
+
+            const matchName =
+                String(student.nama || "")
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchClass =
+                !selectedClass ||
+                student.kelas === selectedClass;
+
+
+            return matchName && matchClass;
+
+        });
+
+
+    const tbody =
+        document.getElementById("studentTable");
+
+
+    if (!filtered.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="text-center py-10 text-slate-400">
+
+                    <i class="fa-solid fa-user-slash text-2xl mb-2"></i>
+
+                    <div>
+                    Tiada murid ditemui.
+                    </div>
+
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    filtered.sort(function(a, b) {
+
+        return String(a.nama)
+            .localeCompare(
+                String(b.nama),
+                "ms"
+            );
+
+    });
+
+
+    tbody.innerHTML =
+        filtered.map(function(student, index) {
+
+            const hasRecord =
+                student.currentRecordId !== "";
+
+
+            return `
+            <tr class="hover:bg-emerald-50/40">
+
+                <td class="px-4 py-3 text-slate-400">
+                    ${index + 1}
+                </td>
+
+                <td class="px-4 py-3">
+
+                    <div class="font-bold">
+                        ${escapeHtml(student.nama)}
+                    </div>
+
+                    ${
+                        student.jantina
+                        ? `<div class="text-[10px] text-slate-400">
+                            ${escapeHtml(student.jantina)}
+                           </div>`
+                        : ""
+                    }
+
+                </td>
+
+
+                <td class="px-4 py-3">
+                    ${escapeHtml(student.kelas || "-")}
+                </td>
+
+
+                <td class="px-4 py-3">
+
+                    ${
+                        hasRecord
+                        ? `
+                            <span class="px-2.5 py-1
+                                         rounded-lg
+                                         bg-emerald-100
+                                         text-emerald-800
+                                         text-xs font-semibold">
+
+                                ${escapeHtml(
+                                    student.tahapSemasa
+                                )}
+
+                            </span>
+                          `
+                        : `
+                            <span class="px-2.5 py-1
+                                         rounded-lg
+                                         bg-slate-100
+                                         text-slate-500
+                                         text-xs">
+
+                                Belum Tasmik
+
+                            </span>
+                          `
+                    }
+
+                </td>
+
+
+                <td class="px-4 py-3">
+
+                    ${
+                        hasRecord
+                        ? "M/S " +
+                          escapeHtml(student.msSemasa)
+                        : "-"
+                    }
+
+                </td>
+
+
+                <td class="px-4 py-3">
+
+                    <div class="flex justify-center gap-2">
+
+
+                        <!-- TASMIK -->
+
+                        <button
+                            onclick="quickTasmik('${escapeJs(student.nama)}')"
+                            class="px-3 py-2
+                                   bg-emerald-100
+                                   text-emerald-700
+                                   hover:bg-emerald-200
+                                   rounded-lg text-xs
+                                   font-semibold">
+
+                            <i class="fa-solid fa-pen-to-square"></i>
+
+                            Tasmik
+
+                        </button>
+
+
+                        <!-- DELETE MURID -->
+
+                        <button
+                            onclick="confirmDeleteStudent(
+                                '${escapeJs(student.id)}',
+                                '${escapeJs(student.nama)}'
+                            )"
+                            class="px-3 py-2
+                                   bg-red-100
+                                   text-red-700
+                                   hover:bg-red-200
+                                   rounded-lg text-xs
+                                   font-semibold"
+                            title="Keluarkan murid">
+
+                            <i class="fa-solid fa-trash"></i>
+
+                        </button>
+
+                    </div>
+
+                </td>
+
+            </tr>
+            `;
+
+        }).join("");
+
+}
+
+
+// ================================================================
+// FILTER KELAS
+// ================================================================
+
+function populateClassFilter() {
+
+    const select =
+        document.getElementById("classFilter");
+
+
+    const current = select.value;
+
+
+    const classes =
+        [...new Set(
+            studentsData
+                .map(s => s.kelas)
+                .filter(Boolean)
+        )]
+        .sort();
+
+
+    select.innerHTML =
+        `<option value="">
+            Semua Kelas
+         </option>`;
+
+
+    classes.forEach(function(cls) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = cls;
+
+        option.textContent = cls;
+
+        select.appendChild(option);
+
+    });
+
+
+    if (classes.includes(current)) {
+
+        select.value = current;
+
+    }
+
+}
+
+
+// ================================================================
+// DROPDOWN MURID
+// ================================================================
+
+function populateStudentDropdown() {
+
+    const select =
+        document.getElementById("entryStudent");
+
+
+    select.innerHTML = `
+        <option value="">
+            -- Pilih Nama Murid --
+        </option>
+    `;
+
+
+    const sorted =
+        [...studentsData]
+        .sort(function(a, b) {
+
+            return String(a.nama)
+                .localeCompare(
+                    String(b.nama),
+                    "ms"
+                );
+
+        });
+
+
+    sorted.forEach(function(student) {
+
+        const option =
+            document.createElement("option");
+
+
+        option.value = student.id;
+
+
+        option.textContent =
+            student.nama +
+            (
+                student.kelas
+                ? " (" + student.kelas + ")"
+                : ""
+            );
+
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+// ================================================================
+// PILIH MURID UNTUK TASMIK
+// ================================================================
+
+function studentSelected() {
+
+    const id =
+        document.getElementById("entryStudent")
+            .value;
+
+
+    const student =
+        studentsData.find(function(s) {
+
+            return String(s.id) === String(id);
+
+        });
+
+
+    const box =
+        document.getElementById(
+            "currentReadingBox"
+        );
+
+
+    if (!student) {
+
+        box.classList.add("hidden");
+
+        return;
+
+    }
+
+
+    box.classList.remove("hidden");
+
+
+    document.getElementById("entryClass")
+        .textContent =
+        student.kelas || "-";
+
+
+    document.getElementById("entryCurrentStage")
+        .textContent =
+        student.tahapSemasa || "Belum ada rekod";
+
+
+    document.getElementById("entryCurrentPage")
+        .textContent =
+        student.msSemasa || "-";
+
+
+    /*
+     * Isi borang berdasarkan bacaan terakhir.
+     */
+
+    if (
+        student.tahapSemasa &&
+        student.tahapSemasa !== "Belum ada rekod"
+    ) {
+
+        document.getElementById("entryStage")
+            .value =
+            student.tahapSemasa;
+
+    } else {
+
+        document.getElementById("entryStage")
+            .value =
+            "Iqra 1";
+
+    }
+
+
+    document.getElementById("entryPage")
+        .value =
+        extractPageNumber(
+            student.msSemasa
+        ) || 1;
+
+
+    /*
+     * Jika ada rekod terakhir,
+     * gunakan surah sebagai cadangan.
+     */
+
+    const latest =
+        getLatestRecord(student.nama);
+
+
+    if (latest) {
+
+        document.getElementById("entrySurah")
+            .value =
+            latest.surah || "";
+
+    } else {
+
+        document.getElementById("entrySurah")
+            .value = "";
+
+    }
+
+}
+
+
+// ================================================================
+// TASMIK PANTAS
+// ================================================================
+
+function quickTasmik(nama) {
+
+    switchTab("entry");
+
+
+    const student =
+        studentsData.find(function(s) {
+
+            return normalizeName(s.nama)
+                === normalizeName(nama);
+
+        });
+
+
+    if (!student) {
+
+        alert("Murid tidak ditemui.");
+
+        return;
+
+    }
+
+
+    document.getElementById("entryStudent")
+        .value = student.id;
+
+
+    studentSelected();
+
+}
+
+
+// ================================================================
+// DAPATKAN REKOD TERKINI
+// ================================================================
+
+function getLatestRecord(nama) {
+
+    const matching =
+        recordsData.filter(function(record) {
+
+            return normalizeName(record.nama)
+                === normalizeName(nama);
+
+        });
+
+
+    if (!matching.length) {
+
+        return null;
+
+    }
+
+
+    matching.sort(function(a, b) {
+
+        const dateA = parseDateValue(a.tarikh);
+
+        const dateB = parseDateValue(b.tarikh);
+
+
+        if (dateB.getTime() !== dateA.getTime()) {
+
+            return dateB - dateA;
+
+        }
+
+
+        return Number(b.recordId || 0)
+            - Number(a.recordId || 0);
+
+    });
+
+
+    return matching[0];
+
+}
+
+
+// ================================================================
+// SIMPAN TASMIK
+// ================================================================
+
+function submitTasmik(event) {
+
+    event.preventDefault();
+
+
+    const studentId =
+        document.getElementById("entryStudent")
+            .value;
+
+
+    const student =
+        studentsData.find(function(s) {
+
+            return String(s.id) === String(studentId);
+
+        });
+
+
+    if (!student) {
+
+        alert("Sila pilih murid.");
+
+        return;
+
+    }
+
+
+    const data = {
+
+        nama: student.nama,
+
+        kelas: student.kelas || "",
+
+        tahap:
+            document.getElementById("entryStage")
+                .value,
+
+        surah:
+            document.getElementById("entrySurah")
+                .value || "",
+
+        mukaSurat:
+            document.getElementById("entryPage")
+                .value,
+
+        ayat:
+            document.getElementById("entryAyat")
+                .value || "",
+
+        penguasaan:
+            document.getElementById("entryMastery")
+                .value,
+
+        tarikh:
+            document.getElementById("entryDate")
+                .value,
+
+        guru:
+            document.getElementById("entryTeacher")
+                .value || "",
+
+        catatan:
+            document.getElementById("entryNotes")
+                .value || ""
+
+    };
+
+
+    const button =
+        document.getElementById(
+            "saveTasmikButton"
+        );
+
+
+    button.disabled = true;
+
+    button.innerHTML =
+        `<i class="fa-solid fa-spinner fa-spin"></i>
+         Menyimpan...`;
+
+
+    showLoading(
+        "Menyimpan rekod Tasmik..."
+    );
+
+
+    tasmikRunner()
+
+        .withSuccessHandler(function(response) {
+
+            hideLoading();
+
+
+            button.disabled = false;
+
+            button.innerHTML =
+                `<i class="fa-solid fa-floppy-disk"></i>
+                 Simpan Rekod Tasmik`;
+
+
+            if (!response || !response.success) {
+
+                alert(
+                    "❌ Gagal menyimpan.\n\n" +
+                    (
+                        response?.message ||
+                        "Ralat tidak diketahui."
+                    )
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "✅ Rekod Tasmik berjaya disimpan."
+            );
+
+
+            document.getElementById(
+                "tasmikForm"
+            ).reset();
+
+
+            document.getElementById(
+                "currentReadingBox"
+            ).classList.add("hidden");
+
+
+            setTodayDate();
+
+
+            syncDataFromSheets();
+
+
+            switchTab("records");
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            hideLoading();
+
+
+            button.disabled = false;
+
+            button.innerHTML =
+                `<i class="fa-solid fa-floppy-disk"></i>
+                 Simpan Rekod Tasmik`;
+
+
+            alert(
+                "❌ Ralat sistem.\n\n" +
+                (
+                    error?.message ||
+                    "Tidak dapat menyimpan."
+                )
+            );
+
+        })
+
+        .simpanRekod(window.tasmikSessionToken, data);
+
+}
+
+
+// ================================================================
+// RENDER REKOD
+// ================================================================
+
+function renderRecords() {
+
+    const search =
+        (
+            document.getElementById(
+                "recordSearch"
+            )?.value || ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    const filtered =
+        recordsData
+        .filter(function(record) {
+
+            const text = [
+
+                record.nama,
+                record.tahap,
+                record.surah,
+                record.tarikh,
+                record.penguasaan,
+                record.catatan
+
+            ]
+            .join(" ")
+            .toLowerCase();
+
+
+            return text.includes(search);
+
+        })
+        .sort(function(a, b) {
+
+            const dateA =
+                parseDateValue(a.tarikh);
+
+            const dateB =
+                parseDateValue(b.tarikh);
+
+
+            if (
+                dateB.getTime() !==
+                dateA.getTime()
+            ) {
+
+                return dateB - dateA;
+
+            }
+
+
+            return Number(b.recordId || 0)
+                - Number(a.recordId || 0);
+
+        });
+
+
+    const tbody =
+        document.getElementById(
+            "recordTable"
+        );
+
+
+    if (!filtered.length) {
+
+        tbody.innerHTML = `
+            <tr>
+
+                <td colspan="7"
+                    class="text-center py-10
+                           text-slate-400">
+
+                    <i class="fa-solid fa-book-open
+                              text-2xl mb-2"></i>
+
+                    <div>
+                    Tiada rekod Tasmik.
+                    </div>
+
+                </td>
+
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        filtered.map(function(record) {
+
+            return `
+            <tr class="hover:bg-red-50/20">
+
+                <td class="px-4 py-3">
+                    ${escapeHtml(
+                        record.tarikh || "-"
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3 font-bold">
+                    ${escapeHtml(
+                        record.nama
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3">
+                    ${escapeHtml(
+                        record.tahap || "-"
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3">
+                    ${escapeHtml(
+                        record.surah || "-"
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3">
+                    ${escapeHtml(
+                        record.mukaSurat || "-"
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3 text-xs">
+                    ${escapeHtml(
+                        record.penguasaan || "-"
+                    )}
+                </td>
+
+
+                <td class="px-4 py-3 text-center">
+
+                    <button
+                        onclick="confirmDeleteRecord(
+                            ${Number(record.recordId)}
+                        )"
+                        class="px-3 py-2
+                               bg-red-100
+                               hover:bg-red-200
+                               text-red-700
+                               rounded-lg
+                               text-xs
+                               font-semibold">
+
+                        <i class="fa-solid fa-trash"></i>
+
+                        Delete
+
+                    </button>
+
+                </td>
+
+            </tr>
+            `;
+
+        }).join("");
+
+}
+
+
+// ================================================================
+// DELETE REKOD TASMIK
+// ================================================================
+
+function confirmDeleteRecord(recordId) {
+
+    const record =
+        recordsData.find(function(r) {
+
+            return Number(r.recordId)
+                === Number(recordId);
+
+        });
+
+
+    if (!record) {
+
+        alert("Rekod tidak ditemui.");
+
+        return;
+
+    }
+
+
+    const confirmDelete =
+        confirm(
+            "⚠️ PADAM REKOD TASMIK\n\n" +
+
+            "Nama: " +
+            record.nama + "\n" +
+
+            "Tarikh: " +
+            record.tarikh + "\n" +
+
+            "Tahap: " +
+            record.tahap + "\n" +
+
+            "M/S: " +
+            record.mukaSurat + "\n\n" +
+
+            "Rekod ini akan dipadam TERUS daripada Google Sheet.\n\n" +
+
+            "Adakah anda pasti?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    showLoading(
+        "Memadam rekod Tasmik..."
+    );
+
+
+    tasmikRunner()
+
+        .withSuccessHandler(function(response) {
+
+            hideLoading();
+
+
+            if (!response || !response.success) {
+
+                alert(
+                    "❌ Gagal memadam.\n\n" +
+                    (
+                        response?.message ||
+                        "Ralat tidak diketahui."
+                    )
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "✅ Rekod berjaya dipadam daripada Google Sheet."
+            );
+
+
+            /*
+             * Sync semula.
+             *
+             * Ini sangat penting kerana bacaan semasa
+             * murid perlu dikira semula selepas delete.
+             */
+
+            syncDataFromSheets();
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            hideLoading();
+
+
+            alert(
+                "❌ Ralat sistem.\n\n" +
+                (
+                    error?.message ||
+                    "Tidak dapat memadam rekod."
+                )
+            );
+
+        })
+
+        .padamRekodTasmik(window.tasmikSessionToken, recordId);
+
+}
+
+
+// ================================================================
+// DELETE MURID
+// ================================================================
+
+function confirmDeleteStudent(id, nama) {
+
+    const confirmDelete =
+        confirm(
+            "⚠️ KELUARKAN MURID\n\n" +
+
+            "Nama: " + nama + "\n\n" +
+
+            "Murid ini akan dikeluarkan daripada Data Murid.\n\n" +
+
+            "Rekod Tasmik lama TIDAK akan dipadam.\n\n" +
+
+            "Adakah anda pasti?"
+        );
+
+
+    if (!confirmDelete) {
+
+        return;
+
+    }
+
+
+    showLoading(
+        "Mengeluarkan murid..."
+    );
+
+
+    tasmikRunner()
+
+        .withSuccessHandler(function(response) {
+
+            hideLoading();
+
+
+            if (!response || !response.success) {
+
+                alert(
+                    "❌ Gagal mengeluarkan murid.\n\n" +
+                    (
+                        response?.message ||
+                        "Ralat tidak diketahui."
+                    )
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "✅ " +
+                response.message
+            );
+
+
+            syncDataFromSheets();
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            hideLoading();
+
+
+            alert(
+                "❌ Ralat sistem.\n\n" +
+                (
+                    error?.message ||
+                    "Tidak dapat mengeluarkan murid."
+                )
+            );
+
+        })
+
+        .padamMurid(window.tasmikSessionToken, id, nama);
+
+}
+
+
+// ================================================================
+// MODAL TAMBAH MURID
+// ================================================================
+
+function openAddStudentModal() {
+
+    const modal =
+        document.getElementById(
+            "studentModal"
+        );
+
+
+    modal.classList.remove("hidden");
+
+    modal.classList.add("flex");
+
+
+    document.getElementById(
+        "newStudentID"
+    ).value = "";
+
+
+    document.getElementById(
+        "newStudentName"
+    ).value = "";
+
+
+    document.getElementById(
+        "newStudentClass"
+    ).value = "";
+
+
+    document.getElementById(
+        "newStudentGender"
+    ).value = "";
+
+
+    document.getElementById(
+        "newStudentName"
+    ).focus();
+
+}
+
+
+function closeAddStudentModal() {
+
+    const modal =
+        document.getElementById(
+            "studentModal"
+        );
+
+
+    modal.classList.add("hidden");
+
+    modal.classList.remove("flex");
+
+}
+
+
+// ================================================================
+// SIMPAN MURID BARU
+// ================================================================
+
+function submitNewStudent(event) {
+
+    event.preventDefault();
+
+
+    const data = {
+
+        id:
+            document.getElementById(
+                "newStudentID"
+            ).value.trim(),
+
+        nama:
+            document.getElementById(
+                "newStudentName"
+            ).value.trim().toUpperCase(),
+
+        kelas:
+            document.getElementById(
+                "newStudentClass"
+            ).value.trim(),
+
+        jantina:
+            document.getElementById(
+                "newStudentGender"
+            ).value
+
+    };
+
+
+    const button =
+        document.getElementById(
+            "saveStudentButton"
+        );
+
+
+    button.disabled = true;
+
+    button.innerHTML =
+        `<i class="fa-solid fa-spinner fa-spin"></i>
+         Menyimpan...`;
+
+
+    showLoading(
+        "Menambah murid..."
+    );
+
+
+    tasmikRunner()
+
+        .withSuccessHandler(function(response) {
+
+            hideLoading();
+
+
+            button.disabled = false;
+
+            button.innerHTML =
+                `<i class="fa-solid fa-user-plus"></i>
+                 Tambah`;
+
+
+            if (!response || !response.success) {
+
+                alert(
+                    "❌ Gagal menambah murid.\n\n" +
+                    (
+                        response?.message ||
+                        "Ralat."
+                    )
+                );
+
+                return;
+
+            }
+
+
+            alert(
+                "✅ Murid berjaya ditambah."
+            );
+
+
+            closeAddStudentModal();
+
+
+            syncDataFromSheets();
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            hideLoading();
+
+
+            button.disabled = false;
+
+            button.innerHTML =
+                `<i class="fa-solid fa-user-plus"></i>
+                 Tambah`;
+
+
+            alert(
+                "❌ Ralat sistem.\n\n" +
+                (
+                    error?.message ||
+                    "Tidak dapat menambah murid."
+                )
+            );
+
+        })
+
+        .simpanMurid(window.tasmikSessionToken, data);
+
+}
+
+
+// ================================================================
+// TAB
+// ================================================================
+
+function switchTab(tab) {
+    if (!window.tasmikSessionToken && tab !== "dashboard") { tasmikOpenLogin(); return; }
+
+    document
+        .querySelectorAll(".view-section")
+        .forEach(function(section) {
+
+            section.classList.add("hidden");
+
+        });
+
+
+    document
+        .querySelectorAll(".tab-button")
+        .forEach(function(button) {
+
+            button.classList.remove("active");
+
+        });
+
+
+    const view =
+        document.getElementById(
+            "view-" + tab
+        );
+
+
+    const button =
+        document.getElementById(
+            "tab-" + tab
+        );
+
+
+    if (view) {
+
+        view.classList.remove("hidden");
+
+    }
+
+
+    if (button) {
+
+        button.classList.add("active");
+
+    }
+
+
+    if (tab === "entry") {
+
+        populateStudentDropdown();
+
+    }
+
+}
+
+
+// ================================================================
+// STATUS SYNC
+// ================================================================
+
+function setSyncStatus(state, message) {
+
+    const box =
+        document.getElementById(
+            "syncStatus"
+        );
+
+
+    const dot =
+        document.getElementById(
+            "syncDot"
+        );
+
+
+    const text =
+        document.getElementById(
+            "syncText"
+        );
+
+
+    box.classList.remove("hidden");
+
+    text.textContent = message;
+
+
+    if (state === "loading") {
+
+        dot.className =
+            "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+
+    } else if (state === "success") {
+
+        dot.className =
+            "w-2 h-2 rounded-full bg-emerald-400";
+
+    } else {
+
+        dot.className =
+            "w-2 h-2 rounded-full bg-red-400";
+
+    }
+
+}
+
+
+// ================================================================
+// LOADING
+// ================================================================
+
+function showLoading(message) {
+
+    document.getElementById(
+        "loadingText"
+    ).textContent =
+        message || "Memproses...";
+
+
+    const overlay =
+        document.getElementById(
+            "loadingOverlay"
+        );
+
+
+    overlay.classList.remove("hidden");
+
+    overlay.classList.add("flex");
+
+}
+
+
+function hideLoading() {
+
+    const overlay =
+        document.getElementById(
+            "loadingOverlay"
+        );
+
+
+    overlay.classList.add("hidden");
+
+    overlay.classList.remove("flex");
+
+}
+
+
+// ================================================================
+// NORMALISASI
+// ================================================================
+
+function normalizeName(value) {
+
+    return String(value || "")
+        .trim()
+        .toUpperCase()
+        .replace(/\s+/g, " ");
+
+}
+
+
+function normalizeStage(value) {
+
+    const text =
+        String(value || "")
+            .trim()
+            .toLowerCase();
+
+
+    if (text === "quran" ||
+        text === "al quran" ||
+        text === "al-quran") {
+
+        return "Al-Quran";
+
+    }
+
+
+    if (text.includes("khatam")) {
+
+        return "Khatam";
+
+    }
+
+
+    const match =
+        text.match(/iqra\s*([1-6])/i);
+
+
+    if (match) {
+
+        return "Iqra " + match[1];
+
+    }
+
+
+    return String(value || "").trim();
+
+}
+
+
+// ================================================================
+// TARIKH
+// ================================================================
+
+function parseDateValue(value) {
+
+    if (!value) {
+
+        return new Date(0);
+
+    }
+
+
+    const text =
+        String(value).trim();
+
+
+    let match =
+        text.match(
+            /^(\d{4})-(\d{1,2})-(\d{1,2})/
+        );
+
+
+    if (match) {
+
+        return new Date(
+            Number(match[1]),
+            Number(match[2]) - 1,
+            Number(match[3])
+        );
+
+    }
+
+
+    match =
+        text.match(
+            /^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/
+        );
+
+
+    if (match) {
+
+        return new Date(
+            Number(match[3]),
+            Number(match[2]) - 1,
+            Number(match[1])
+        );
+
+    }
+
+
+    const date =
+        new Date(text);
+
+
+    return isNaN(date.getTime())
+        ? new Date(0)
+        : date;
+
+}
+
+
+// ================================================================
+// MUKA SURAT
+// ================================================================
+
+function extractPageNumber(value) {
+
+    if (!value) return "";
+
+
+    const match =
+        String(value)
+            .match(/\d+/);
+
+
+    return match
+        ? match[0]
+        : "";
+
+}
+
+
+// ================================================================
+// ESCAPE HTML
+// ================================================================
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ================================================================
+// ESCAPE JAVASCRIPT
+// ================================================================
+
+function escapeJs(value) {
+
+    return String(value ?? "")
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\r/g, "\\r")
+        .replace(/\n/g, "\\n");
+
+}
+
+
+// ================================================================
+// CIRI TAMBAHAN: ANALISIS, IMPORT BUNDLE & LOGO
+// ================================================================
+
+let advancedAnalysisData = null;
+let analysisMode = "overall";
+let analysisStageChart = null;
+let analysisMasteryChart = null;
+let pendingStudentImport = [];
+
+function loadAdditionalSystemData() {
+    if (!window.tasmikSessionToken) return;
+    if (!tasmikHasBridge()) return;
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            if (response && response.success) {
+                advancedAnalysisData = response;
+                populateAnalysisClassSelect();
+                renderAdvancedAnalysis();
+            }
+        })
+        .withFailureHandler(function() {})
+        .getAnalisisData(window.tasmikSessionToken);
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            if (response && response.success && response.logo) {
+                applySchoolLogo(response.logo);
+            }
+        })
+        .withFailureHandler(function() {})
+        .getLogoSekolah(window.tasmikSessionToken);
+}
+
+function applySchoolLogo(src) {
+    const wrap = document.getElementById("schoolLogoWrap");
+    const img = document.getElementById("schoolLogo");
+    const icon = document.getElementById("defaultHeaderIcon");
+
+    if (!wrap || !img) return;
+
+    if (src) {
+        img.src = src;
+        wrap.classList.remove("hidden");
+        if (icon) icon.classList.add("hidden");
+    } else {
+        wrap.classList.add("hidden");
+        if (icon) icon.classList.remove("hidden");
+    }
+}
+
+function setAnalysisMode(mode) {
+    if (!window.tasmikSessionToken && mode === "class") { tasmikOpenLogin(); return; }
+    analysisMode = mode;
+
+    const overall = document.getElementById("analysisOverallBtn");
+    const byClass = document.getElementById("analysisClassBtn");
+    const select = document.getElementById("analysisClassSelect");
+    const table = document.getElementById("analysisClassTableWrap");
+
+    if (mode === "class") {
+        overall.className = "px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700";
+        byClass.className = "px-3 py-2 rounded-lg text-xs font-semibold bg-emerald-700 text-white";
+        select.classList.remove("hidden");
+        table.classList.remove("hidden");
+    } else {
+        overall.className = "px-3 py-2 rounded-lg text-xs font-semibold bg-emerald-700 text-white";
+        byClass.className = "px-3 py-2 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700";
+        select.classList.add("hidden");
+        table.classList.add("hidden");
+    }
+
+    renderAdvancedAnalysis();
+}
+
+function populateAnalysisClassSelect() {
+    const select = document.getElementById("analysisClassSelect");
+    if (!select || !advancedAnalysisData) return;
+
+    // Kelas di sini datang 100% daripada Data Murid melalui getAnalisisData().
+    // Tiada senarai kelas hard-coded dalam HTML.
+    const classes = (advancedAnalysisData.mengikutKelas || [])
+        .map(x => String(x.kelas || "").trim())
+        .filter(Boolean);
+    const current = select.value;
+
+    select.innerHTML = classes.length
+        ? classes.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join("")
+        : '<option value="">Tiada kelas dalam Data Murid</option>';
+
+    if (classes.includes(current)) {
+        select.value = current;
+    } else if (classes.length) {
+        select.value = classes[0];
+    }
+}
+
+function renderAdvancedAnalysis() {
+    if (!advancedAnalysisData || !advancedAnalysisData.success) return;
+
+    let totalStudents = Number(advancedAnalysisData.ringkasan?.jumlahMurid || 0);
+    let recorded = Number(advancedAnalysisData.ringkasan?.jumlahMuridBerrekod || 0);
+    let unrecorded = Number(advancedAnalysisData.ringkasan?.jumlahMuridBelumBerrekod || 0);
+    let totalRecords = Number(advancedAnalysisData.ringkasan?.jumlahRekod || 0);
+    let stageData = {...(advancedAnalysisData.mengikutTahap || {})};
+    let masteryData = {...(advancedAnalysisData.mengikutPenguasaan || {})};
+
+    if (analysisMode === "class") {
+        const selected = document.getElementById("analysisClassSelect")?.value || "";
+        if (selected) {
+            const cls = (advancedAnalysisData.mengikutKelas || []).find(x => String(x.kelas) === String(selected));
+            totalStudents = Number(cls?.jumlahMurid || 0);
+            recorded = Number(cls?.muridBerrekod || 0);
+            unrecorded = Math.max(0, totalStudents - recorded);
+            totalRecords = Number(cls?.jumlahRekod || 0);
+
+            stageData = {};
+            masteryData = {};
+
+            studentsData
+                .filter(s => String(s.kelas || "") === String(selected))
+                .forEach(s => {
+                    const latest = getLatestRecord(s.nama);
+                    const stage = latest?.tahap || s.tahapSemasa;
+                    if (stage && stage !== "Belum ada rekod") {
+                        stageData[stage] = (stageData[stage] || 0) + 1;
+                    }
+                });
+
+            recordsData
+                .filter(r => {
+                    const student = studentsData.find(s => normalizeName(s.nama) === normalizeName(r.nama));
+                    return student && String(student.kelas || "") === String(selected);
+                })
+                .forEach(r => {
+                    const m = r.penguasaan || "Tidak Dinyatakan";
+                    masteryData[m] = (masteryData[m] || 0) + 1;
+                });
+        }
+    }
+
+    document.getElementById("analysisStudents").textContent = totalStudents;
+    document.getElementById("analysisRecorded").textContent = recorded;
+    document.getElementById("analysisUnrecorded").textContent = unrecorded;
+    document.getElementById("analysisRecords").textContent = totalRecords;
+
+    renderAnalysisCharts(stageData, masteryData);
+
+    const tbody = document.getElementById("analysisClassTable");
+    if (tbody) {
+        tbody.innerHTML = (advancedAnalysisData.mengikutKelas || []).map(c => {
+            const belum = Math.max(0, Number(c.jumlahMurid || 0) - Number(c.muridBerrekod || 0));
+            return `<tr>
+                <td class="px-3 py-3 font-semibold">${escapeHtml(c.kelas)}</td>
+                <td class="px-3 py-3 text-center">${Number(c.jumlahMurid || 0)}</td>
+                <td class="px-3 py-3 text-center text-emerald-700">${Number(c.muridBerrekod || 0)}</td>
+                <td class="px-3 py-3 text-center text-amber-600">${belum}</td>
+                <td class="px-3 py-3 text-center text-blue-700">${Number(c.jumlahRekod || 0)}</td>
+            </tr>`;
+        }).join("");
+    }
+}
+
+function renderAnalysisCharts(stageData, masteryData) {
+    const stageCanvas = document.getElementById("analysisStageChart");
+    const masteryCanvas = document.getElementById("analysisMasteryChart");
+    if (!stageCanvas || !masteryCanvas || typeof Chart === "undefined") return;
+
+    if (analysisStageChart) analysisStageChart.destroy();
+    if (analysisMasteryChart) analysisMasteryChart.destroy();
+
+    const stageLabels = Object.keys(stageData);
+    const stageValues = stageLabels.map(k => Number(stageData[k] || 0));
+
+    const masteryLabels = Object.keys(masteryData);
+    const masteryValues = masteryLabels.map(k => Number(masteryData[k] || 0));
+
+    analysisStageChart = new Chart(stageCanvas.getContext("2d"), {
+        type: "bar",
+        data: {
+            labels: stageLabels,
+            datasets: [{
+                label: "Bilangan",
+                data: stageValues,
+                backgroundColor: "#059669"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+        }
+    });
+
+    analysisMasteryChart = new Chart(masteryCanvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+            labels: masteryLabels,
+            datasets: [{
+                data: masteryValues,
+                backgroundColor: ["#059669","#2563eb","#f59e0b","#ef4444","#64748b"]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
+
+// Panggil analisis tambahan selepas sync sedia ada selesai.
+const _originalRenderAll = renderAll;
+renderAll = function() {
+    _originalRenderAll();
+    loadAdditionalSystemData();
+};
+
+
+// ================================================================
+// IMPORT MURID BUNDLE
+// ================================================================
+
+function openImportStudentModal() {
+    const modal = document.getElementById("importStudentModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    pendingStudentImport = [];
+    document.getElementById("studentImportFile").value = "";
+    document.getElementById("importPreviewWrap").classList.add("hidden");
+    document.getElementById("importSummary").classList.add("hidden");
+    document.getElementById("confirmImportButton").disabled = true;
+}
+
+function closeImportStudentModal() {
+    const modal = document.getElementById("importStudentModal");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+function downloadStudentTemplate() {
+    showLoading("Menyediakan template murid...");
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            hideLoading();
+
+            if (!response || !response.success) {
+                alert("❌ Gagal menyediakan template.\n\n" + (response?.message || "Ralat."));
+                return;
+            }
+
+            const blob = new Blob(['\uFEFF', response.csv], {type:'text/csv;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = response.fileName || 'Templat_Import_Murid_Tasmik.csv';
+            document.body.appendChild(link); link.click(); link.remove();
+            setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            alert("❌ Gagal menyediakan template.\n\n" + (error?.message || "Ralat."));
+        })
+        .ciptaTemplateMurid(window.tasmikSessionToken);
+}
+
+function handleStudentImportFile(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        try {
+            let rows = [];
+
+            if (file.name.toLowerCase().endsWith(".csv")) {
+                const text = e.target.result;
+                rows = parseSimpleCsv(text);
+            } else {
+                if (typeof XLSX === "undefined") {
+                    throw new Error("Modul pembacaan Excel tidak tersedia.");
+                }
+
+                const workbook = XLSX.read(e.target.result, {type: "array"});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                rows = XLSX.utils.sheet_to_json(firstSheet, {defval:""});
+            }
+
+            prepareStudentImport(rows);
+        } catch (err) {
+            pendingStudentImport = [];
+            alert("❌ Fail tidak dapat dibaca.\n\n" + err.message);
+        }
+    };
+
+    if (file.name.toLowerCase().endsWith(".csv")) {
+        reader.readAsText(file);
+    } else {
+        reader.readAsArrayBuffer(file);
+    }
+}
+
+function parseSimpleCsv(text) {
+    const lines = String(text).split(/\r?\n/).filter(x => x.trim() !== "");
+    if (!lines.length) return [];
+
+    const parseLine = line => {
+        const out = [];
+        let cur = "", quoted = false;
+        for (let i=0; i<line.length; i++) {
+            const ch = line[i];
+            if (ch === '"') {
+                if (quoted && line[i+1] === '"') { cur += '"'; i++; }
+                else quoted = !quoted;
+            } else if (ch === "," && !quoted) {
+                out.push(cur.trim()); cur = "";
+            } else cur += ch;
+        }
+        out.push(cur.trim());
+        return out;
+    };
+
+    const headers = parseLine(lines[0]).map(x => String(x).trim());
+    return lines.slice(1).map(line => {
+        const vals = parseLine(line);
+        const obj = {};
+        headers.forEach((h,i) => obj[h] = vals[i] ?? "");
+        return obj;
+    });
+}
+
+function prepareStudentImport(rows) {
+    const get = (obj, aliases) => {
+        const keys = Object.keys(obj || {});
+        const found = keys.find(k => aliases.some(a => normalizeHeaderClient(k) === normalizeHeaderClient(a)));
+        return found ? String(obj[found] ?? "").trim() : "";
+    };
+
+    pendingStudentImport = rows
+        .map(row => ({
+            id: get(row, ["ID","ID Murid","No ID","No. ID"]),
+            nama: get(row, ["Nama","Nama Murid","Nama Pelajar"]).toUpperCase(),
+            kelas: get(row, ["Kelas","Kelas Murid","Darjah","Tahun"]),
+            jantina: get(row, ["Jantina","Gender"])
+        }))
+        .filter(x => x.nama);
+
+    renderImportPreview();
+}
+
+function normalizeHeaderClient(value) {
+    return String(value || "")
+        .toLowerCase()
+        .replace(/[\s._:/-]+/g, "")
+        .replace(/[()]/g, "");
+}
+
+function renderImportPreview() {
+    const tbody = document.getElementById("importPreviewTable");
+    const wrap = document.getElementById("importPreviewWrap");
+    const summary = document.getElementById("importSummary");
+    const button = document.getElementById("confirmImportButton");
+
+    if (!pendingStudentImport.length) {
+        wrap.classList.add("hidden");
+        summary.classList.remove("hidden");
+        summary.textContent = "❌ Tiada data murid yang sah ditemui dalam fail.";
+        button.disabled = true;
+        return;
+    }
+
+    const existingNames = new Set(studentsData.map(s => normalizeName(s.nama)));
+    const seen = new Set();
+    let valid = 0;
+    let duplicate = 0;
+
+    tbody.innerHTML = pendingStudentImport.map((x, i) => {
+        const key = normalizeName(x.nama);
+        let status = "Boleh diimport";
+        let cls = "text-emerald-700";
+
+        if (existingNames.has(key)) {
+            status = "Nama sudah wujud";
+            cls = "text-red-600";
+            duplicate++;
+        } else if (seen.has(key)) {
+            status = "Nama berulang dalam fail";
+            cls = "text-red-600";
+            duplicate++;
+        } else {
+            seen.add(key);
+            valid++;
+        }
+
+        return `<tr>
+            <td class="px-3 py-2">${escapeHtml(x.id || "(auto)")}</td>
+            <td class="px-3 py-2 font-semibold">${escapeHtml(x.nama)}</td>
+            <td class="px-3 py-2">${escapeHtml(x.kelas || "-")}</td>
+            <td class="px-3 py-2">${escapeHtml(x.jantina || "-")}</td>
+            <td class="px-3 py-2 ${cls}">${status}</td>
+        </tr>`;
+    }).join("");
+
+    wrap.classList.remove("hidden");
+    summary.classList.remove("hidden");
+    summary.innerHTML =
+        `<b>${pendingStudentImport.length}</b> baris ditemui.
+         <span class="text-emerald-700">${valid} akan dicuba untuk import</span>
+         dan <span class="text-red-600">${duplicate} dikesan berpotensi berganda.</span>`;
+
+    button.disabled = valid === 0;
+}
+
+function confirmStudentImport() {
+    if (!pendingStudentImport.length) return;
+
+    showLoading("Mengimport murid ke Data Murid...");
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            hideLoading();
+
+            if (!response || !response.success) {
+                alert("❌ Import gagal.\n\n" + (response?.message || "Ralat."));
+                return;
+            }
+
+            let msg = "✅ " + response.imported + " murid berjaya diimport.";
+            if (response.rejected) {
+                msg += "\n\n" + response.rejected + " baris tidak diimport kerana berganda/bermasalah.";
+            }
+
+            alert(msg);
+            closeImportStudentModal();
+            syncDataFromSheets();
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            alert("❌ Ralat sistem.\n\n" + (error?.message || "Tidak dapat mengimport."));
+        })
+        .importMuridBundle(window.tasmikSessionToken, pendingStudentImport);
+}
+
+
+// ================================================================
+// TETAPAN LOGO SEKOLAH
+// ================================================================
+
+let pendingLogoData = null;
+
+function openSystemSettings() {
+    if (!window.tasmikSessionToken) { tasmikOpenLogin(); return; }
+    const modal = document.getElementById("systemSettingsModal");
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+    pendingLogoData = null;
+    const input = document.getElementById("schoolLogoFile");
+    if (input) input.value = "";
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            if (response?.success && response.logo) {
+                const img = document.getElementById("settingsLogoPreview");
+                const ph = document.getElementById("settingsLogoPlaceholder");
+                img.src = response.logo;
+                img.classList.remove("hidden");
+                ph.classList.add("hidden");
+            }
+        })
+        .withFailureHandler(function() {})
+        .getLogoSekolah(window.tasmikSessionToken);
+}
+
+function closeSystemSettings() {
+    const modal = document.getElementById("systemSettingsModal");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+
+function previewSchoolLogo(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert("Saiz logo melebihi 2 MB.");
+        event.target.value = "";
+        pendingLogoData = null;
+        return;
+    }
+
+    const allowed = ["image/png","image/jpeg","image/webp"];
+    if (!allowed.includes(file.type)) {
+        alert("Format logo mestilah PNG, JPG atau WEBP.");
+        event.target.value = "";
+        pendingLogoData = null;
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        pendingLogoData = {
+            base64: e.target.result,
+            fileName: file.name,
+            mimeType: file.type
+        };
+
+        const img = document.getElementById("settingsLogoPreview");
+        const ph = document.getElementById("settingsLogoPlaceholder");
+        img.src = e.target.result;
+        img.classList.remove("hidden");
+        ph.classList.add("hidden");
+    };
+    reader.readAsDataURL(file);
+}
+
+function uploadSchoolLogo() {
+    if (!pendingLogoData) {
+        alert("Sila pilih fail logo terlebih dahulu.");
+        return;
+    }
+
+    const btn = document.getElementById("uploadLogoButton");
+    btn.disabled = true;
+    showLoading("Menyimpan logo sekolah...");
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            hideLoading();
+            btn.disabled = false;
+
+            if (!response || !response.success) {
+                alert("❌ Logo gagal disimpan.\n\n" + (response?.message || "Ralat."));
+                return;
+            }
+
+            applySchoolLogo(response.logo);
+            alert("✅ Logo sekolah berjaya disimpan.");
+            closeSystemSettings();
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            btn.disabled = false;
+            alert("❌ Ralat sistem.\n\n" + (error?.message || "Tidak dapat menyimpan logo."));
+        })
+        .uploadLogoSekolah(window.tasmikSessionToken, pendingLogoData);
+}
+
+function removeSchoolLogo() {
+    if (!confirm("Padam logo sekolah daripada sistem?")) return;
+
+    showLoading("Memadam logo sekolah...");
+
+    tasmikRunner()
+        .withSuccessHandler(function(response) {
+            hideLoading();
+
+            if (!response || !response.success) {
+                alert("❌ Logo gagal dipadam.\n\n" + (response?.message || "Ralat."));
+                return;
+            }
+
+            applySchoolLogo("");
+            alert("✅ Logo sekolah telah dipadam.");
+        })
+        .withFailureHandler(function(error) {
+            hideLoading();
+            alert("❌ Ralat sistem.\n\n" + (error?.message || "Tidak dapat memadam logo."));
+        })
+        .padamLogoSekolah(window.tasmikSessionToken);
+}
+
+
+// ================================================================
+// MULAKAN CIRI TAMBAHAN SELEPAS HALAMAN SIAP
+// ================================================================
+
+// Data tambahan dimuat sekali melalui renderAll selepas penyelarasan berjaya.
+
+</script>
+
+
+<style>
+
+/* TAB */
+
+.tab-button {
+
+    padding:10px 16px;
+
+    border-bottom:2px solid transparent;
+
+    color:#64748b;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+
+.tab-button:hover {
+
+    color:#047857;
+
+}
+
+
+.tab-button.active {
+
+    color:#047857;
+
+    border-bottom-color:#059669;
+
+}
+
+</style>
+
+
+</body>
+
+</html>
