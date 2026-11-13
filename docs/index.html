@@ -8,7 +8,19 @@
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0">
 
-<title>e-Rekod Tasmik KPM</title>
+<title>eRekTas | Rekod Tasmik LTB</title>
+<meta name="application-name" content="eRekTas">
+<meta name="theme-color" content="#065f46">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="eRekTas">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/x-icon" href="./icons/favicon.ico?v=1">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/icon-32-v1.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192-v1.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-v1.png">
+<script src="./install.js" defer></script>
 
 
 <script src="./config.js"></script>
@@ -221,6 +233,7 @@ table { min-width: max-content; }
 
 /* Telefon sangat kecil */
 @media (max-width: 390px) {
+    #appStatus { display: none; }
     header .text-xs.text-emerald-200 { display: none; }
     header .font-bold.text-lg { font-size: .88rem !important; }
     #schoolLogoWrap, #defaultHeaderIcon {
@@ -277,10 +290,14 @@ body.tasmik-public #analysisClassBtn,body.tasmik-public #analysisClassSelect { d
 #tasmikHelpCard input { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:10px; font-size:16px; box-sizing:border-box; }
 #tasmikHelpCard button, #tasmikHelpCard a { display:inline-block; background:#047857; color:white; border:0; border-radius:8px; padding:10px 12px; margin:8px 4px 0 0; cursor:pointer; font-weight:600; }
 #tasmikHelpMessage { color:#9a3412; overflow-wrap:anywhere; }
+#tasmikInstallSection { margin:20px 0 12px; padding:16px; border:1px solid #a7f3d0; border-radius:12px; background:#ecfdf5; }
+#tasmikInstallSection h3 { margin:0; color:#064e3b; font-size:16px; font-weight:800; }
+#tasmikInstallSection [hidden] { display:none; }
 @media(max-width:767px) { header .h-16 { flex-wrap:wrap; } header .h-16 > .flex:last-child { width:100%; justify-content:flex-end; } }
 </style>
 <div id="tasmikHelpPanel" hidden role="dialog" aria-modal="true" aria-labelledby="tasmikHelpTitle">
  <div id="tasmikHelpCard">
+  <img src="./icons/icon-192-v1.png" alt="Ikon eRekTas" width="56" height="56" style="border-radius:14px;margin-bottom:12px">
   <h2 id="tasmikHelpTitle">Bantuan Akses &amp; Kongsi Pautan</h2>
   <p id="tasmikHelpMessage" role="status" aria-live="polite"></p>
   <label for="tasmikShareUrl">Pautan untuk dikongsi kepada guru</label>
@@ -294,6 +311,16 @@ body.tasmik-public #analysisClassBtn,body.tasmik-public #analysisClassSelect { d
    <li>Jika masih gagal, minta pemilik menyemak deployment dan dasar akaun sekolah.</li>
   </ol>
   <p>Butang tab baharu mungkin masih menggunakan pelayar dalam aplikasi. Pilih Safari/Chrome secara manual melalui menunya.</p>
+  <section id="tasmikInstallSection" aria-labelledby="tasmikInstallTitle">
+   <h3 id="tasmikInstallTitle">eRekTas di Skrin Utama</h3>
+   <p>Buka aplikasi terus melalui ikon al-Quran dan tanda semak pada telefon.</p>
+   <button id="tasmikInstallButton" type="button" hidden>Pasang eRekTas</button>
+   <ol id="tasmikInstallGuide">
+    <li><strong>Android (Chrome):</strong> buka menu ⋮ → Tambah ke Skrin Utama / Add to Home screen → Pasang atau Tambah.</li>
+    <li><strong>iPhone/iPad (Safari):</strong> tekan Kongsi → Tambah ke Skrin Utama / Add to Home Screen → Tambah.</li>
+   </ol>
+   <p id="tasmikInstallStatus" role="status" aria-live="polite">Gunakan Chrome atau Safari secara terus jika pautan dibuka daripada WhatsApp. Jika pintasan lama masih memaparkan ikon lama, buang pintasan itu dan tambah semula.</p>
+  </section>
   <button type="button" onclick="tasmikCloseAccessHelp(); syncDataFromSheets()">Cuba Muat Data</button>
   <a href="./sambungan.html" target="_blank" rel="noopener noreferrer">Semak Sambungan</a>
   <button type="button" onclick="tasmikCloseAccessHelp()" style="background:#e2e8f0;color:#334155">Tutup</button>
@@ -302,7 +329,7 @@ body.tasmik-public #analysisClassBtn,body.tasmik-public #analysisClassSelect { d
 
 <div id="tasmikAuthOverlay" hidden>
  <div id="tasmikAuthCard">
-  <div style="font-size:40px;color:#047857">&#128274;</div>
+  <img src="./icons/icon-192-v1.png" alt="Ikon eRekTas" width="76" height="76" style="margin:0 auto;border-radius:18px">
   <h1 style="font-size:23px;font-weight:800;color:#064e3b;margin:12px 0 4px">Akses Guru e-Rekod Tasmik</h1>
   <p style="color:#64748b;font-size:14px">PIN diperlukan untuk melihat rekod individu, menambah atau mengubah data.</p>
   <form id="tasmikAuthForm" onsubmit="return tasmikLogin(event)">
@@ -564,9 +591,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="defaultHeaderIcon"
      class="w-11 h-11 rounded-xl bg-emerald-600
             flex items-center justify-center
-            text-amber-300 text-xl">
+            overflow-hidden shrink-0">
 
-<i class="fa-solid fa-book-quran"></i>
+<img src="./icons/icon-192-v1.png" alt="Ikon eRekTas" width="44" height="44" class="w-full h-full object-cover">
 
 </div>
 
@@ -4313,17 +4340,14 @@ function loadAdditionalSystemData() {
 function applySchoolLogo(src) {
     const wrap = document.getElementById("schoolLogoWrap");
     const img = document.getElementById("schoolLogo");
-    const icon = document.getElementById("defaultHeaderIcon");
 
     if (!wrap || !img) return;
 
     if (src) {
         img.src = src;
         wrap.classList.remove("hidden");
-        if (icon) icon.classList.add("hidden");
     } else {
         wrap.classList.add("hidden");
-        if (icon) icon.classList.remove("hidden");
     }
 }
 
@@ -4909,3 +4933,4 @@ function removeSchoolLogo() {
 </body>
 
 </html>
+
